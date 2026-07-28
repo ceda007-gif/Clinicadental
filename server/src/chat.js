@@ -1,8 +1,8 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenAI } from '@google/genai';
 import { getBranches, getServices, addAppointment, getClinicName } from './db.js';
 import { getFreeSlots, isSlotFree, AvailabilityError } from './availability.js';
 
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const MAX_TOOL_ITERATIONS = 6;
 
 function newAppointmentId() {
@@ -13,22 +13,22 @@ const TOOLS = [
   {
     name: 'list_branches',
     description: 'Devuelve las sucursales de la clínica con su dirección y horario. Úsala si el paciente no ha dicho a qué sucursal quiere ir, o si pregunta por ubicaciones.',
-    input_schema: { type: 'object', properties: {}, required: [] }
+    parameters: { type: 'OBJECT', properties: {}, required: [] }
   },
   {
     name: 'list_services',
     description: 'Devuelve el catálogo de servicios/tratamientos disponibles, incluyendo "Solo valoración" para quien no sabe qué tratamiento necesita.',
-    input_schema: { type: 'object', properties: {}, required: [] }
+    parameters: { type: 'OBJECT', properties: {}, required: [] }
   },
   {
     name: 'check_availability',
     description: 'Consulta los horarios disponibles de una sucursal en una fecha específica para un servicio dado. Úsala antes de ofrecer horarios concretos al paciente.',
-    input_schema: {
-      type: 'object',
+    parameters: {
+      type: 'OBJECT',
       properties: {
-        branchId: { type: 'string', description: 'ID de la sucursal (obtenido de list_branches).' },
-        date: { type: 'string', description: 'Fecha en formato AAAA-MM-DD.' },
-        service: { type: 'string', description: 'Nombre del servicio de interés (para calcular duración de la cita).' }
+        branchId: { type: 'STRING', description: 'ID de la sucursal (obtenido de list_branches).' },
+        date: { type: 'STRING', description: 'Fecha en formato AAAA-MM-DD.' },
+        service: { type: 'STRING', description: 'Nombre del servicio de interés (para calcular duración de la cita).' }
       },
       required: ['branchId', 'date']
     }
@@ -36,17 +36,17 @@ const TOOLS = [
   {
     name: 'book_appointment',
     description: 'Agenda la cita en el calendario una vez que el paciente confirmó sucursal, servicio, fecha y horario, y ya diste sus datos de contacto. No la uses sin confirmación explícita del paciente sobre el horario exacto.',
-    input_schema: {
-      type: 'object',
+    parameters: {
+      type: 'OBJECT',
       properties: {
-        branchId: { type: 'string' },
-        service: { type: 'string' },
-        date: { type: 'string', description: 'AAAA-MM-DD' },
-        time: { type: 'string', description: 'HH:MM, 24 horas' },
-        name: { type: 'string', description: 'Nombre completo del paciente.' },
-        whatsapp: { type: 'string', description: 'Número de WhatsApp del paciente.' },
-        email: { type: 'string', description: 'Correo electrónico del paciente.' },
-        notes: { type: 'string', description: 'Notas adicionales, opcional.' }
+        branchId: { type: 'STRING' },
+        service: { type: 'STRING' },
+        date: { type: 'STRING', description: 'AAAA-MM-DD' },
+        time: { type: 'STRING', description: 'HH:MM, 24 horas' },
+        name: { type: 'STRING', description: 'Nombre completo del paciente.' },
+        whatsapp: { type: 'STRING', description: 'Número de WhatsApp del paciente.' },
+        email: { type: 'STRING', description: 'Correo electrónico del paciente.' },
+        notes: { type: 'STRING', description: 'Notas adicionales, opcional.' }
       },
       required: ['branchId', 'service', 'date', 'time', 'name', 'whatsapp', 'email']
     }
@@ -142,7 +142,7 @@ function systemPrompt() {
 }
 
 export async function runChat(history, userMessage) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return {
       reply: 'El asistente de citas todavía no está activado (falta configurar la clave de la API). Mientras tanto, escríbenos por WhatsApp para agendar.',
@@ -150,48 +150,51 @@ export async function runChat(history, userMessage) {
     };
   }
 
-  const client = new Anthropic({ apiKey: apiKey });
-  const messages = history.concat([{ role: 'user', content: userMessage }]);
+  const client = new GoogleGenAI({ apiKey: apiKey });
+  const contents = history.concat([{ role: 'user', parts: [{ text: userMessage }] }]);
 
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
-    const response = await client.messages.create({
+    const response = await client.models.generateContent({
       model: MODEL,
-      max_tokens: 1024,
-      system: systemPrompt(),
-      tools: TOOLS,
-      messages: messages
+      contents: contents,
+      config: {
+        systemInstruction: systemPrompt(),
+        tools: [{ functionDeclarations: TOOLS }]
+      }
     });
 
-    messages.push({ role: 'assistant', content: response.content });
+    const candidateContent = response.candidates && response.candidates[0] && response.candidates[0].content;
+    const parts = (candidateContent && candidateContent.parts) || [];
+    contents.push({ role: 'model', parts: parts });
 
-    if (response.stop_reason !== 'tool_use') {
-      const textBlock = response.content.find(function (block) { return block.type === 'text'; });
+    const functionCalls = response.functionCalls;
+    if (!functionCalls || !functionCalls.length) {
       return {
-        reply: textBlock ? textBlock.text : '',
-        history: messages
+        reply: response.text || '',
+        history: contents
       };
     }
 
-    const toolResults = [];
-    for (const block of response.content) {
-      if (block.type !== 'tool_use') continue;
+    const responseParts = functionCalls.map(function (call) {
       let result;
       try {
-        result = runTool(block.name, block.input || {});
+        result = runTool(call.name, call.args || {});
       } catch (err) {
         result = { error: 'Error interno: ' + err.message };
       }
-      toolResults.push({
-        type: 'tool_result',
-        tool_use_id: block.id,
-        content: JSON.stringify(result)
-      });
-    }
-    messages.push({ role: 'user', content: toolResults });
+      return {
+        functionResponse: {
+          id: call.id,
+          name: call.name,
+          response: result
+        }
+      };
+    });
+    contents.push({ role: 'user', parts: responseParts });
   }
 
   return {
     reply: 'Lo siento, tuve un problema procesando tu solicitud. ¿Podrías intentar de nuevo o escribirnos por WhatsApp?',
-    history: messages
+    history: contents
   };
 }

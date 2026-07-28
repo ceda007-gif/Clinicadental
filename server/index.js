@@ -29,7 +29,7 @@ function requireAdmin(req, res, next) {
 }
 
 app.get('/api/health', function (req, res) {
-  res.json({ ok: true, aiEnabled: Boolean(process.env.ANTHROPIC_API_KEY) });
+  res.json({ ok: true, aiEnabled: Boolean(process.env.GEMINI_API_KEY) });
 });
 
 app.get('/api/clinic', function (req, res) {
@@ -126,7 +126,7 @@ app.get('/admin.html', function (req, res) { res.sendFile(path.join(SITE_ROOT, '
 
 app.listen(PORT, function () {
   console.log('Clinicadental API + sitio estático escuchando en el puerto ' + PORT);
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.warn('ANTHROPIC_API_KEY no configurada: el asistente de chat responderá con un mensaje de aviso hasta que se configure.');
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('GEMINI_API_KEY no configurada: el asistente de chat responderá con un mensaje de aviso hasta que se configure.');
   }
 });

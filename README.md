@@ -10,7 +10,7 @@ como HTML/CSS/JS estático, sin build step.
 
 También incluye un **asistente de citas con IA** (chat en la landing) que conversa con el
 paciente, pregunta sucursal/servicio/datos de contacto, consulta un calendario real de
-disponibilidad y agenda la cita — usando la API de Claude, vía un backend en `server/`.
+disponibilidad y agenda la cita — usando la API de Gemini, vía un backend en `server/`.
 
 ## Estructura
 
@@ -57,8 +57,8 @@ El backend vive en `server/` y hace tres cosas:
 
 1. Sirve una API de disponibilidad (`GET /api/availability`) calculada a partir del horario
    de cada sucursal (`server/src/db.js`) y las citas ya agendadas — nunca inventa horarios.
-2. Expone el agente conversacional (`POST /api/chat`), que usa la API de Claude con
-   *tool use* para consultar sucursales/servicios/disponibilidad y agendar
+2. Expone el agente conversacional (`POST /api/chat`), que usa la API de Gemini con
+   *function calling* para consultar sucursales/servicios/disponibilidad y agendar
    (`server/src/chat.js`). El mismo agente atiende ambas sucursales: pregunta cuál le
    interesa al paciente (o la usa si ya se sabe) y solo ofrece horarios reales de esa sucursal.
 3. Guarda las citas agendadas (por el bot o por el formulario) en `server/data/db.json`
@@ -66,14 +66,15 @@ El backend vive en `server/` y hace tres cosas:
    marca cada una como "Asistente IA" o "Formulario".
 
 Para que el chat converse de verdad (y no solo el resto del sitio), copia
-`server/.env.example` a `server/.env` y agrega tu `ANTHROPIC_API_KEY` antes de
-`npm start`. Sin ella, el sitio y el panel funcionan igual, pero el chat responde con un
-aviso de "asistente no activado todavía" en vez de conversar.
+`server/.env.example` a `server/.env` y agrega tu `GEMINI_API_KEY` (se obtiene gratis en
+[aistudio.google.com/apikey](https://aistudio.google.com/apikey)) antes de `npm start`.
+Sin ella, el sitio y el panel funcionan igual, pero el chat responde con un aviso de
+"asistente no activado todavía" en vez de conversar.
 
 ### Desplegarlo
 
 El backend es un servidor Node normal (Express) — se puede desplegar en Render, Railway,
-Fly.io, etc. Variables de entorno necesarias: `ANTHROPIC_API_KEY` (obligatoria para que el
+Fly.io, etc. Variables de entorno necesarias: `GEMINI_API_KEY` (obligatoria para que el
 chat funcione) y `ADMIN_TOKEN` (protege los endpoints de citas del panel de administración).
 
 Si el sitio estático sigue en GitHub Pages y el backend en otro dominio, hay que apuntar el
