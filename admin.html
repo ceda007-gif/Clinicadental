@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de administración | Clínica Dental Sonrisa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="admin">
+
+  <!-- LOGIN -->
+  <div class="admin-login" id="loginScreen">
+    <form id="loginForm">
+      <div class="brand">
+        <div class="brand-mark" id="loginBrandMark"></div>
+        <span class="brand-name" id="loginClinicName"></span>
+      </div>
+      <h1>Panel de administración</h1>
+      <div>
+        <input type="text" id="loginUser" placeholder="Usuario" autocomplete="username">
+      </div>
+      <div>
+        <input type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password">
+      </div>
+      <p class="field-error hidden" id="loginError"></p>
+      <button type="submit" class="btn btn-admin">Iniciar sesión</button>
+      <p class="hint">Demo: admin@clinicasonrisa.com / admin123</p>
+    </form>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="admin-shell hidden" id="dashboard">
+    <aside class="admin-sidebar">
+      <div class="brand">
+        <div class="brand-mark" id="sidebarBrandMark"></div>
+        <span id="sidebarClinicName"></span>
+      </div>
+      <nav class="admin-nav" id="adminNav"></nav>
+      <div class="spacer"></div>
+      <a href="#" class="admin-logout" id="logoutLink">Cerrar sesión</a>
+      <a href="./index.html" class="admin-view-site">Ver sitio público →</a>
+    </aside>
+
+    <main class="admin-main">
+
+      <!-- CITAS -->
+      <section id="view-citas" class="admin-view">
+        <h1>Citas</h1>
+        <p class="subtitle">Solicitudes recibidas desde el formulario de la landing.</p>
+        <div id="appointmentsList" class="admin-list"></div>
+        <div id="appointmentsEmpty" class="admin-empty hidden">Aún no hay citas registradas.</div>
+      </section>
+
+      <!-- HERO -->
+      <section id="view-hero" class="admin-view hidden">
+        <h1>Textos del hero</h1>
+        <p class="subtitle">El titular principal que ven los visitantes al entrar.</p>
+        <div class="admin-panel">
+          <label>Etiqueta superior
+            <input type="text" id="heroEyebrowInput">
+          </label>
+          <label>Título
+            <input type="text" id="heroTitleInput">
+          </label>
+          <label>Subtítulo
+            <textarea id="heroSubtitleInput" rows="3"></textarea>
+          </label>
+          <div>
+            <button class="btn btn-admin admin-save" id="saveHeroBtn">Guardar cambios</button>
+            <span class="saved-flag hidden" id="savedHero">Guardado ✓</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVICIOS -->
+      <section id="view-servicios" class="admin-view hidden">
+        <div class="admin-header-row">
+          <div>
+            <h1>Servicios</h1>
+            <p>Tratamientos que se muestran en la landing.</p>
+          </div>
+          <button class="btn btn-admin" id="addServiceBtn">+ Agregar servicio</button>
+        </div>
+        <div id="servicesList" class="admin-list"></div>
+        <div>
+          <button class="btn btn-admin admin-save" id="saveServicesBtn">Guardar cambios</button>
+          <span class="saved-flag hidden" id="savedServicios">Guardado ✓</span>
+        </div>
+      </section>
+
+      <!-- EQUIPO -->
+      <section id="view-equipo" class="admin-view hidden">
+        <div class="admin-header-row">
+          <div>
+            <h1>Equipo</h1>
+            <p>Doctores que se muestran en la landing.</p>
+          </div>
+          <button class="btn btn-admin" id="addTeamBtn">+ Agregar doctor(a)</button>
+        </div>
+        <div id="teamList" class="admin-list"></div>
+        <div>
+          <button class="btn btn-admin admin-save" id="saveTeamBtn">Guardar cambios</button>
+          <span class="saved-flag hidden" id="savedEquipo">Guardado ✓</span>
+        </div>
+      </section>
+
+      <!-- TESTIMONIOS -->
+      <section id="view-testimonios" class="admin-view hidden">
+        <div class="admin-header-row">
+          <div>
+            <h1>Testimonios</h1>
+            <p>Reseñas de pacientes que se muestran en la landing.</p>
+          </div>
+          <button class="btn btn-admin" id="addTestimonialBtn">+ Agregar testimonio</button>
+        </div>
+        <div id="testimonialsList" class="admin-list"></div>
+        <div>
+          <button class="btn btn-admin admin-save" id="saveTestimonialsBtn">Guardar cambios</button>
+          <span class="saved-flag hidden" id="savedTestimonios">Guardado ✓</span>
+        </div>
+      </section>
+
+      <!-- HORARIOS Y CONTACTO -->
+      <section id="view-horarios" class="admin-view hidden">
+        <h1>Horarios y contacto</h1>
+        <p class="subtitle">Información que aparece en el pie de página y en los botones de WhatsApp.</p>
+        <div class="admin-panel">
+          <label>Dirección
+            <input type="text" id="infoAddress">
+          </label>
+          <label>Horario Lun–Vie
+            <input type="text" id="infoHoursWeekday">
+          </label>
+          <label>Horario Sábado
+            <input type="text" id="infoHoursSaturday">
+          </label>
+          <label>Teléfono a mostrar
+            <input type="text" id="infoWaPhoneDisplay">
+          </label>
+          <label>Número de WhatsApp (solo dígitos, con código de país)
+            <input type="text" id="infoWaPhone" style="font-family:ui-monospace,monospace">
+          </label>
+          <label>Correo
+            <input type="text" id="infoEmail">
+          </label>
+          <div>
+            <button class="btn btn-admin admin-save" id="saveInfoBtn">Guardar cambios</button>
+            <span class="saved-flag hidden" id="savedHorarios">Guardado ✓</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script type="module" src="./js/admin.js"></script>
+</body>
+</html>

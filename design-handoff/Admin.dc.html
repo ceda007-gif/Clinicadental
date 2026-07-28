@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Inter',sans-serif;background:#f4f8f9}
+input,textarea,select,button{font-family:inherit}
+a{text-decoration:none}
+</style>
+</helmet>
+
+<sc-if value="{{ notLoggedIn }}" hint-placeholder-val="{{ true }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4f8f9;padding:24px;box-sizing:border-box">
+    <form onSubmit="{{ onLogin }}" style="width:360px;max-width:100%;background:#ffffff;border-radius:20px;padding:40px;box-shadow:0 20px 40px rgba(16,24,32,.08);display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="width:38px;height:38px;border-radius:12px;background:#0d9488;display:flex;align-items:center;justify-content:center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ffffff" stroke-width="2.2"></circle><path d="M8.5 12.5l2.2 2.2 4.8-5.4" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </div>
+        <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:18px">{{ clinicName }}</span>
+      </div>
+      <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:22px;margin:0">Panel de administración</h1>
+      <div>
+        <input type="text" placeholder="Usuario" value="{{ loginForm.user }}" onChange="{{ onLoginChange.user }}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #d9e3e2;font-size:14.5px">
+      </div>
+      <div>
+        <input type="password" placeholder="Contraseña" value="{{ loginForm.pass }}" onChange="{{ onLoginChange.pass }}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #d9e3e2;font-size:14.5px">
+      </div>
+      <sc-if value="{{ loginError }}"><p style="color:#c0392b;font-size:13px;margin:0">{{ loginError }}</p></sc-if>
+      <button type="submit" style="background:#0d9488;color:#ffffff;font-weight:600;font-size:15px;padding:13px 20px;border:none;border-radius:999px;cursor:pointer" style-hover="background:#0b7c72">Iniciar sesión</button>
+      <p style="font-size:12px;color:#8a969b;margin:0;text-align:center">Demo: admin@clinicasonrisa.com / admin123</p>
+    </form>
+  </div>
+</sc-if>
+
+<sc-if value="{{ loggedIn }}">
+  <div style="min-height:100vh;display:flex">
+
+    <!-- SIDEBAR -->
+    <aside style="width:220px;flex:none;background:#16232b;color:#cfd8dc;display:flex;flex-direction:column;padding:24px 0">
+      <div style="display:flex;align-items:center;gap:10px;padding:0 20px 24px">
+        <div style="width:32px;height:32px;border-radius:10px;background:#0d9488;display:flex;align-items:center;justify-content:center;flex:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ffffff" stroke-width="2.4"></circle></svg>
+        </div>
+        <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14.5px;color:#ffffff;line-height:1.2">{{ clinicName }}</span>
+      </div>
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+        <a href="{{ item.href }}" onClick="{{ item.onClick }}" style="display:flex;align-items:center;gap:10px;padding:12px 20px;color:{{ item.color }};font-size:14.5px;font-weight:500;cursor:pointer;border-left:3px solid {{ item.borderColor }};background:{{ item.bg }}">{{ item.label }}</a>
+      </sc-for>
+      <div style="flex:1"></div>
+      <a href="#" onClick="{{ onLogout }}" style="padding:12px 20px;color:#9fadb3;font-size:13.5px;cursor:pointer">Cerrar sesión</a>
+      <a href="./Landing Dental Final.dc.html" style="padding:4px 20px 0;color:#6d7b81;font-size:12px">Ver sitio público →</a>
+    </aside>
+
+    <!-- MAIN -->
+    <main style="flex:1;min-width:0;padding:36px 44px;max-width:980px">
+
+      <!-- CITAS -->
+      <sc-if value="{{ isCitas }}">
+        <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:26px;margin:0 0 6px">Citas</h1>
+        <p style="font-size:14.5px;color:#5b6b72;margin:0 0 28px">Solicitudes recibidas desde el formulario de la landing.</p>
+        <sc-if value="{{ hasAppointments }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ appointments }}" as="appt" hint-placeholder-count="3">
+              <div style="background:#ffffff;border-radius:16px;padding:20px 24px;box-shadow:0 4px 16px rgba(16,24,32,.05);display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+                <div style="flex:1 1 220px;min-width:180px">
+                  <p style="font-weight:600;font-size:15.5px;margin:0 0 4px">{{ appt.nombre }}</p>
+                  <p style="font-size:13.5px;color:#5b6b72;margin:0">{{ appt.telefono }}</p>
+                </div>
+                <div style="flex:1 1 160px;min-width:140px">
+                  <p style="font-size:13px;color:#8a969b;margin:0 0 2px">Servicio</p>
+                  <p style="font-size:14px;margin:0">{{ appt.servicioDisplay }}</p>
+                </div>
+                <div style="flex:1 1 200px;min-width:180px">
+                  <p style="font-size:13px;color:#8a969b;margin:0 0 2px">Mensaje</p>
+                  <p style="font-size:13.5px;margin:0;color:#425059">{{ appt.mensajeDisplay }}</p>
+                </div>
+                <div style="flex:none">
+                  <p style="font-size:12px;color:#8a969b;margin:0 0 4px">{{ appt.dateDisplay }}</p>
+                  <select value="{{ appt.status }}" onChange="{{ appt.onStatusChange }}" style="font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid #d9e3e2;background:#f4f8f9">
+                    <option value="nuevo">Nuevo</option>
+                    <option value="contactado">Contactado</option>
+                    <option value="confirmado">Confirmado</option>
+                  </select>
+                </div>
+                <button onClick="{{ appt.onDelete }}" style="flex:none;background:none;border:none;color:#c0392b;font-size:13px;cursor:pointer;padding:6px 10px">Eliminar</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noAppointments }}">
+          <div style="background:#ffffff;border-radius:16px;padding:40px;text-align:center;color:#8a969b;font-size:14.5px">Aún no hay citas registradas.</div>
+        </sc-if>
+      </sc-if>
+
+      <!-- HERO -->
+      <sc-if value="{{ isHero }}">
+        <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:26px;margin:0 0 6px">Textos del hero</h1>
+        <p style="font-size:14.5px;color:#5b6b72;margin:0 0 28px">El titular principal que ven los visitantes al entrar.</p>
+        <div style="background:#ffffff;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px;max-width:600px">
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Etiqueta superior
+            <input type="text" value="{{ draft.hero.eyebrow }}" onChange="{{ onHeroChange.eyebrow }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px">
+          </label>
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Título
+            <input type="text" value="{{ draft.hero.title }}" onChange="{{ onHeroChange.title }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px">
+          </label>
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Subtítulo
+            <textarea value="{{ draft.hero.subtitle }}" onChange="{{ onHeroChange.subtitle }}" rows="3" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px;resize:vertical"></textarea>
+          </label>
+          <button onClick="{{ onSaveHero }}" style="align-self:flex-start;background:#0d9488;color:#ffffff;font-weight:600;font-size:14.5px;padding:11px 20px;border:none;border-radius:999px;cursor:pointer">Guardar cambios</button>
+          <sc-if value="{{ savedHero }}"><span style="color:#0b7c72;font-size:13px">Guardado ✓</span></sc-if>
+        </div>
+      </sc-if>
+
+      <!-- SERVICIOS -->
+      <sc-if value="{{ isServicios }}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+          <div>
+            <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:26px;margin:0 0 6px">Servicios</h1>
+            <p style="font-size:14.5px;color:#5b6b72;margin:0">Tratamientos que se muestran en la landing.</p>
+          </div>
+          <button onClick="{{ onAddService }}" style="background:#0d9488;color:#ffffff;font-weight:600;font-size:14px;padding:10px 18px;border:none;border-radius:999px;cursor:pointer">+ Agregar servicio</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ draft.services }}" as="item" hint-placeholder-count="6">
+            <div style="background:#ffffff;border-radius:16px;padding:20px 24px;box-shadow:0 4px 16px rgba(16,24,32,.05);display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+              <input type="text" value="{{ item.title }}" onChange="{{ item.onTitleChange }}" placeholder="Nombre del servicio" style="flex:1 1 200px;min-width:160px;padding:10px 12px;border-radius:10px;border:1px solid #d9e3e2;font-size:14px;font-weight:600">
+              <input type="text" value="{{ item.desc }}" onChange="{{ item.onDescChange }}" placeholder="Descripción breve" style="flex:2 1 260px;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid #d9e3e2;font-size:14px">
+              <button onClick="{{ item.onDelete }}" style="flex:none;background:none;border:none;color:#c0392b;font-size:13px;cursor:pointer">Eliminar</button>
+            </div>
+          </sc-for>
+        </div>
+        <button onClick="{{ onSaveServices }}" style="margin-top:20px;background:#0d9488;color:#ffffff;font-weight:600;font-size:14.5px;padding:12px 22px;border:none;border-radius:999px;cursor:pointer">Guardar cambios</button>
+        <sc-if value="{{ savedServices }}"><span style="margin-left:12px;color:#0b7c72;font-size:13px">Guardado ✓</span></sc-if>
+      </sc-if>
+
+      <!-- EQUIPO -->
+      <sc-if value="{{ isEquipo }}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+          <div>
+            <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:26px;margin:0 0 6px">Equipo</h1>
+            <p style="font-size:14.5px;color:#5b6b72;margin:0">Doctores que se muestran en la landing.</p>
+          </div>
+          <button onClick="{{ onAddTeam }}" style="background:#0d9488;color:#ffffff;font-weight:600;font-size:14px;padding:10px 18px;border:none;border-radius:999px;cursor:pointer">+ Agregar doctor(a)</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ draft.team }}" as="item" hint-placeholder-count="3">
+            <div style="background:#ffffff;border-radius:16px;padding:20px 24px;box-shadow:0 4px 16px rgba(16,24,32,.05);display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+              <input type="text" value="{{ item.name }}" onChange="{{ item.onNameChange }}" placeholder="Nombre" style="flex:1 1 200px;min-width:160px;padding:10px 12px;border-radius:10px;border:1px solid #d9e3e2;font-size:14px;font-weight:600">
+              <input type="text" value="{{ item.role }}" onChange="{{ item.onRoleChange }}" placeholder="Especialidad" style="flex:1 1 200px;min-width:160px;padding:10px 12px;border-radius:10px;border:1px solid #d9e3e2;font-size:14px">
+              <button onClick="{{ item.onDelete }}" style="flex:none;background:none;border:none;color:#c0392b;font-size:13px;cursor:pointer">Eliminar</button>
+            </div>
+          </sc-for>
+        </div>
+        <button onClick="{{ onSaveTeam }}" style="margin-top:20px;background:#0d9488;color:#ffffff;font-weight:600;font-size:14.5px;padding:12px 22px;border:none;border-radius:999px;cursor:pointer">Guardar cambios</button>
+        <sc-if value="{{ savedTeam }}"><span style="margin-left:12px;color:#0b7c72;font-size:13px">Guardado ✓</span></sc-if>
+      </sc-if>
+
+      <!-- TESTIMONIOS -->
+      <sc-if value="{{ isTestimonios }}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+          <div>
+            <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:26px;margin:0 0 6px">Testimonios</h1>
+            <p style="font-size:14.5px;color:#5b6b72;margin:0">Reseñas de pacientes que se muestran en la landing.</p>
+          </div>
+          <button onClick="{{ onAddTestimonial }}" style="background:#0d9488;color:#ffffff;font-weight:600;font-size:14px;padding:10px 18px;border:none;border-radius:999px;cursor:pointer">+ Agregar testimonio</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ draft.testimonials }}" as="item" hint-placeholder-count="3">
+            <div style="background:#ffffff;border-radius:16px;padding:20px 24px;box-shadow:0 4px 16px rgba(16,24,32,.05);display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
+              <textarea value="{{ item.quote }}" onChange="{{ item.onQuoteChange }}" placeholder="Reseña" rows="2" style="flex:2 1 260px;min-width:220px;padding:10px 12px;border-radius:10px;border:1px solid #d9e3e2;font-size:14px;resize:vertical"></textarea>
+              <input type="text" value="{{ item.name }}" onChange="{{ item.onNameChange }}" placeholder="Nombre del paciente" style="flex:1 1 160px;min-width:140px;padding:10px 12px;border-radius:10px;border:1px solid #d9e3e2;font-size:14px">
+              <button onClick="{{ item.onDelete }}" style="flex:none;background:none;border:none;color:#c0392b;font-size:13px;cursor:pointer">Eliminar</button>
+            </div>
+          </sc-for>
+        </div>
+        <button onClick="{{ onSaveTestimonials }}" style="margin-top:20px;background:#0d9488;color:#ffffff;font-weight:600;font-size:14.5px;padding:12px 22px;border:none;border-radius:999px;cursor:pointer">Guardar cambios</button>
+        <sc-if value="{{ savedTestimonials }}"><span style="margin-left:12px;color:#0b7c72;font-size:13px">Guardado ✓</span></sc-if>
+      </sc-if>
+
+      <!-- HORARIOS Y CONTACTO -->
+      <sc-if value="{{ isHorarios }}">
+        <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:26px;margin:0 0 6px">Horarios y contacto</h1>
+        <p style="font-size:14.5px;color:#5b6b72;margin:0 0 28px">Información que aparece en el pie de página y en los botones de WhatsApp.</p>
+        <div style="background:#ffffff;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px;max-width:600px">
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Dirección
+            <input type="text" value="{{ draft.address }}" onChange="{{ onInfoChange.address }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px">
+          </label>
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Horario Lun–Vie
+            <input type="text" value="{{ draft.hoursWeekday }}" onChange="{{ onInfoChange.hoursWeekday }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px">
+          </label>
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Horario Sábado
+            <input type="text" value="{{ draft.hoursSaturday }}" onChange="{{ onInfoChange.hoursSaturday }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px">
+          </label>
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Teléfono a mostrar
+            <input type="text" value="{{ draft.waPhoneDisplay }}" onChange="{{ onInfoChange.waPhoneDisplay }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px">
+          </label>
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Número de WhatsApp (solo dígitos, con código de país)
+            <input type="text" value="{{ draft.waPhone }}" onChange="{{ onInfoChange.waPhone }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px;font-family:ui-monospace,monospace">
+          </label>
+          <label style="font-size:13px;color:#5b6b72;font-weight:600">Correo
+            <input type="text" value="{{ draft.email }}" onChange="{{ onInfoChange.email }}" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 13px;border-radius:10px;border:1px solid #d9e3e2;font-size:14.5px">
+          </label>
+          <button onClick="{{ onSaveInfo }}" style="align-self:flex-start;background:#0d9488;color:#ffffff;font-weight:600;font-size:14.5px;padding:11px 20px;border:none;border-radius:999px;cursor:pointer">Guardar cambios</button>
+          <sc-if value="{{ savedInfo }}"><span style="color:#0b7c72;font-size:13px">Guardado ✓</span></sc-if>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SECTIONS = [
+  { id: 'citas', label: 'Citas' },
+  { id: 'hero', label: 'Hero' },
+  { id: 'servicios', label: 'Servicios' },
+  { id: 'equipo', label: 'Equipo' },
+  { id: 'testimonios', label: 'Testimonios' },
+  { id: 'horarios', label: 'Horarios y contacto' }
+];
+
+function fmtDate(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) + ' · ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    return '';
+  }
+}
+
+let idCounter = 0;
+function newId(prefix) {
+  idCounter += 1;
+  return prefix + Date.now() + idCounter;
+}
+
+class Component extends DCLogic {
+  state = {
+    loggedIn: false,
+    loginForm: { user: '', pass: '' },
+    loginError: '',
+    section: 'citas',
+    content: null,
+    draft: null,
+    appointments: [],
+    savedFlags: {}
+  };
+
+  async componentDidMount() {
+    const store = await import('./dental-content-store.js');
+    this.store = store;
+    const content = store.loadContent();
+    this.setState({
+      content: content,
+      draft: JSON.parse(JSON.stringify(content)),
+      appointments: store.loadAppointments()
+    });
+  }
+
+  handleLoginChange(field, value) {
+    this.setState(function (s) {
+      const next = Object.assign({}, s.loginForm);
+      next[field] = value;
+      return { loginForm: next };
+    });
+  }
+
+  handleLogin(e) {
+    e.preventDefault();
+    const f = this.state.loginForm;
+    if (f.user.trim() === 'admin@clinicasonrisa.com' && f.pass === 'admin123') {
+      this.setState({ loggedIn: true, loginError: '' });
+    } else {
+      this.setState({ loginError: 'Usuario o contraseña incorrectos.' });
+    }
+  }
+
+  handleLogout() {
+    this.setState({ loggedIn: false, loginForm: { user: '', pass: '' } });
+  }
+
+  goSection(id) {
+    this.setState({ section: id, savedFlags: {} });
+  }
+
+  flashSaved(key) {
+    const self = this;
+    this.setState(function (s) {
+      const next = Object.assign({}, s.savedFlags);
+      next[key] = true;
+      return { savedFlags: next };
+    });
+    setTimeout(function () {
+      self.setState(function (s) {
+        const next = Object.assign({}, s.savedFlags);
+        next[key] = false;
+        return { savedFlags: next };
+      });
+    }, 2000);
+  }
+
+  updateDraft(mutator) {
+    this.setState(function (s) {
+      const next = JSON.parse(JSON.stringify(s.draft));
+      mutator(next);
+      return { draft: next };
+    });
+  }
+
+  updateAppointment(id, field, value) {
+    const self = this;
+    this.setState(function (s) {
+      const list = s.appointments.map(function (a) {
+        if (a.id !== id) return a;
+        const next = Object.assign({}, a);
+        next[field] = value;
+        return next;
+      });
+      self.store.saveAppointments(list);
+      return { appointments: list };
+    });
+  }
+
+  deleteAppointment(id) {
+    const self = this;
+    this.setState(function (s) {
+      const list = s.appointments.filter(function (a) { return a.id !== id; });
+      self.store.saveAppointments(list);
+      return { appointments: list };
+    });
+  }
+
+  saveSection(sectionKey, dataFn) {
+    const content = Object.assign({}, this.state.content);
+    dataFn(content);
+    this.store.saveContent(content);
+    this.setState({ content: content });
+    this.flashSaved(sectionKey);
+  }
+
+  renderVals() {
+    const self = this;
+    const draft = this.state.draft || {
+      hero: { eyebrow: '', title: '', subtitle: '' },
+      services: [], team: [], testimonials: [],
+      address: '', hoursWeekday: '', hoursSaturday: '', waPhoneDisplay: '', waPhone: '', email: ''
+    };
+    const clinicName = this.state.content ? this.state.content.clinicName : 'Clínica Dental Sonrisa';
+    const section = this.state.section;
+
+    const navItems = SECTIONS.map(function (s) {
+      const active = s.id === section;
+      return {
+        id: s.id,
+        href: '#',
+        label: s.label,
+        onClick: function (e) { e.preventDefault(); self.goSection(s.id); },
+        color: active ? '#ffffff' : '#9fadb3',
+        bg: active ? 'rgba(13,148,136,.25)' : 'transparent',
+        borderColor: active ? '#0d9488' : 'transparent'
+      };
+    });
+
+    const appointments = (this.state.appointments || []).map(function (a) {
+      return Object.assign({}, a, {
+        servicioDisplay: a.servicio || '—',
+        mensajeDisplay: a.mensaje || '—',
+        dateDisplay: fmtDate(a.createdAt),
+        onStatusChange: function (e) { self.updateAppointment(a.id, 'status', e.target.value); },
+        onDelete: function () { self.deleteAppointment(a.id); }
+      });
+    });
+
+    const servicesDraft = (draft.services || []).map(function (item, idx) {
+      return Object.assign({}, item, {
+        onTitleChange: function (e) { self.updateDraft(function (d) { d.services[idx].title = e.target.value; }); },
+        onDescChange: function (e) { self.updateDraft(function (d) { d.services[idx].desc = e.target.value; }); },
+        onDelete: function () { self.updateDraft(function (d) { d.services.splice(idx, 1); }); }
+      });
+    });
+
+    const teamDraft = (draft.team || []).map(function (item, idx) {
+      return Object.assign({}, item, {
+        onNameChange: function (e) { self.updateDraft(function (d) { d.team[idx].name = e.target.value; }); },
+        onRoleChange: function (e) { self.updateDraft(function (d) { d.team[idx].role = e.target.value; }); },
+        onDelete: function () { self.updateDraft(function (d) { d.team.splice(idx, 1); }); }
+      });
+    });
+
+    const testimonialsDraft = (draft.testimonials || []).map(function (item, idx) {
+      return Object.assign({}, item, {
+        onQuoteChange: function (e) { self.updateDraft(function (d) { d.testimonials[idx].quote = e.target.value; }); },
+        onNameChange: function (e) { self.updateDraft(function (d) { d.testimonials[idx].name = e.target.value; }); },
+        onDelete: function () { self.updateDraft(function (d) { d.testimonials.splice(idx, 1); }); }
+      });
+    });
+
+    return {
+      clinicName: clinicName,
+      notLoggedIn: !this.state.loggedIn,
+      loggedIn: this.state.loggedIn,
+      loginForm: this.state.loginForm,
+      loginError: this.state.loginError,
+      onLoginChange: {
+        user: function (e) { self.handleLoginChange('user', e.target.value); },
+        pass: function (e) { self.handleLoginChange('pass', e.target.value); }
+      },
+      onLogin: function (e) { self.handleLogin(e); },
+      onLogout: function (e) { e.preventDefault(); self.handleLogout(); },
+      navItems: navItems,
+      isCitas: section === 'citas',
+      isHero: section === 'hero',
+      isServicios: section === 'servicios',
+      isEquipo: section === 'equipo',
+      isTestimonios: section === 'testimonios',
+      isHorarios: section === 'horarios',
+      appointments: appointments,
+      hasAppointments: appointments.length > 0,
+      noAppointments: appointments.length === 0,
+      draft: Object.assign({}, draft, { services: servicesDraft, team: teamDraft, testimonials: testimonialsDraft }),
+      onHeroChange: {
+        eyebrow: function (e) { self.updateDraft(function (d) { d.hero.eyebrow = e.target.value; }); },
+        title: function (e) { self.updateDraft(function (d) { d.hero.title = e.target.value; }); },
+        subtitle: function (e) { self.updateDraft(function (d) { d.hero.subtitle = e.target.value; }); }
+      },
+      onSaveHero: function () { self.saveSection('hero', function (c) { c.hero = self.state.draft.hero; }); },
+      savedHero: !!this.state.savedFlags.hero,
+      onAddService: function () {
+        self.updateDraft(function (d) { d.services.push({ id: newId('s'), shape: 'circle', title: 'Nuevo servicio', desc: 'Descripción breve del tratamiento.' }); });
+      },
+      onSaveServices: function () { self.saveSection('servicios', function (c) { c.services = self.state.draft.services; }); },
+      savedServices: !!this.state.savedFlags.servicios,
+      onAddTeam: function () {
+        self.updateDraft(function (d) { d.team.push({ id: newId('t'), name: 'Nuevo doctor(a)', role: 'Especialidad' }); });
+      },
+      onSaveTeam: function () { self.saveSection('equipo', function (c) { c.team = self.state.draft.team; }); },
+      savedTeam: !!this.state.savedFlags.equipo,
+      onAddTestimonial: function () {
+        self.updateDraft(function (d) { d.testimonials.push({ id: newId('r'), quote: 'Nueva reseña de paciente.', name: 'Nombre del paciente' }); });
+      },
+      onSaveTestimonials: function () { self.saveSection('testimonios', function (c) { c.testimonials = self.state.draft.testimonials; }); },
+      savedTestimonials: !!this.state.savedFlags.testimonios,
+      onInfoChange: {
+        address: function (e) { self.updateDraft(function (d) { d.address = e.target.value; }); },
+        hoursWeekday: function (e) { self.updateDraft(function (d) { d.hoursWeekday = e.target.value; }); },
+        hoursSaturday: function (e) { self.updateDraft(function (d) { d.hoursSaturday = e.target.value; }); },
+        waPhoneDisplay: function (e) { self.updateDraft(function (d) { d.waPhoneDisplay = e.target.value; }); },
+        waPhone: function (e) { self.updateDraft(function (d) { d.waPhone = e.target.value; }); },
+        email: function (e) { self.updateDraft(function (d) { d.email = e.target.value; }); }
+      },
+      onSaveInfo: function () {
+        self.saveSection('horarios', function (c) {
+          c.address = self.state.draft.address;
+          c.hoursWeekday = self.state.draft.hoursWeekday;
+          c.hoursSaturday = self.state.draft.hoursSaturday;
+          c.waPhoneDisplay = self.state.draft.waPhoneDisplay;
+          c.waPhone = self.state.draft.waPhone;
+          c.email = self.state.draft.email;
+        });
+      },
+      savedInfo: !!this.state.savedFlags.horarios
+    };
+  }
+}
+</script>
+</body>
+</html>

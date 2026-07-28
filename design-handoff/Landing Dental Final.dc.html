@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<title>Clínica Dental Sonrisa | Odontología general, ortodoncia e implantes</title>
+<meta name="description" content="Clínica Dental Sonrisa: odontología general, ortodoncia, blanqueamiento, endodoncia, implantes y odontopediatría. Agenda tu cita por WhatsApp.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.clinicadentalsonrisa.com/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:title" content="Clínica Dental Sonrisa | Odontología general, ortodoncia e implantes">
+<meta property="og:description" content="Tratamientos completos para el cuidado de tu boca: ortodoncia, blanqueamiento, endodoncia, implantes y más. Agenda tu cita hoy.">
+<meta property="og:url" content="https://www.clinicadentalsonrisa.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Clínica Dental Sonrisa">
+<meta name="twitter:description" content="Odontología general, ortodoncia, implantes y más. Agenda tu cita por WhatsApp.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Dentist","name":"Clínica Dental Sonrisa","image":"https://www.clinicadentalsonrisa.com/og-image.jpg","telephone":"+52XXXXXXXXXX","address":{"@type":"PostalAddress","streetAddress":"Dirección de ejemplo","addressLocality":"Ciudad","addressCountry":"MX"},"priceRange":"$$","url":"https://www.clinicadentalsonrisa.com/"}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Inter',sans-serif}
+a{text-decoration:none}
+input,textarea,select{font-family:inherit}
+</style>
+</helmet>
+<!-- Reemplaza título, descripción, canonical, teléfono y dirección del JSON-LD con los datos reales antes de publicar -->
+<div style="font-family:'Inter',sans-serif;color:#16232b;background:#ffffff;">
+
+  <!-- HEADER -->
+  <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:16px 40px;background:#ffffff;border-bottom:1px solid rgba(14,165,233,.12)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;border-radius:12px;background:#0ea5e9;display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ffffff" stroke-width="2.2"></circle><path d="M8.5 12.5l2.2 2.2 4.8-5.4" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </div>
+      <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:19px;letter-spacing:-0.2px">{{ clinicName }}</span>
+    </div>
+    <nav style="display:flex;gap:28px;flex-wrap:wrap">
+      <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="5">
+        <a href="{{ link.href }}" style="color:#425059;font-size:15px;font-weight:500" style-hover="color:#0ea5e9">{{ link.label }}</a>
+      </sc-for>
+    </nav>
+    <a href="{{ heroWaLink }}" target="_blank" style="background:#0ea5e9;color:#ffffff;font-weight:600;font-size:14.5px;padding:11px 22px;border-radius:999px;white-space:nowrap" style-hover="background:#0284c7">Agendar cita</a>
+  </header>
+
+  <main>
+  <!-- HERO -->
+  <section style="display:flex;align-items:center;gap:56px;flex-wrap:wrap;padding:76px 40px 84px;background:linear-gradient(180deg,#f2f9fd 0%,#ffffff 70%)">
+    <div style="flex:1 1 420px;min-width:320px">
+      <span style="display:inline-block;background:#e0f2fe;color:#0284c7;font-size:13px;font-weight:600;letter-spacing:.3px;padding:7px 14px;border-radius:999px;margin-bottom:20px">{{ hero.eyebrow }}</span>
+      <h1 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:clamp(32px,4vw,48px);line-height:1.12;margin:0 0 20px;letter-spacing:-0.5px">{{ hero.title }}</h1>
+      <p style="font-size:17px;line-height:1.6;color:#526169;max-width:460px;margin:0 0 32px">{{ hero.subtitle }}</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+        <a href="{{ heroWaLink }}" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:#0ea5e9;color:#ffffff;font-weight:600;font-size:16px;padding:15px 26px;border-radius:999px;box-shadow:0 10px 24px rgba(14,165,233,.28)" style-hover="background:#0284c7">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.1.2-.3.2-.5.1-1.4-.6-2.3-1.4-3.1-2.8-.1-.2-.1-.4.1-.5.2-.2.5-.5.6-.7.1-.2 0-.4-.1-.6-.1-.2-.6-1.4-.8-1.9-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.1s.9 2.5 1.1 2.7c1.3 1.7 2.6 2.6 4.6 3.3.6.2 1.1.3 1.4.2.4-.1 1.2-.5 1.4-1 .2-.5.2-.9.1-1-.1-.1-.2-.1-.4-.2Z"></path></svg>
+          Agendar cita por WhatsApp
+        </a>
+        <a href="#servicios" style="display:inline-flex;align-items:center;background:#ffffff;color:#0ea5e9;font-weight:600;font-size:16px;padding:15px 26px;border-radius:999px;border:1.5px solid #0ea5e9" style-hover="background:#f2f9fd">Ver servicios</a>
+      </div>
+      <p style="font-size:12.5px;color:#8a969b;margin:0">Número de WhatsApp de ejemplo — reemplázalo con el de tu clínica antes de publicar.</p>
+    </div>
+    <div style="flex:1 1 380px;min-width:300px">
+      <div style="aspect-ratio:4/3;border-radius:24px;background:repeating-linear-gradient(135deg,#e0f2fe 0 14px,#eaf6fd 14px 28px);display:flex;align-items:center;justify-content:center;box-shadow:0 20px 40px rgba(16,24,32,.08)">
+        <span style="font-family:ui-monospace,monospace;font-size:13px;color:#0284c7;background:#ffffff;padding:8px 14px;border-radius:8px">foto de consultorio / equipo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section id="servicios" style="padding:88px 40px">
+    <div style="text-align:center;max-width:560px;margin:0 auto 48px">
+      <h2 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:clamp(26px,3vw,34px);margin:0 0 12px">Nuestros servicios</h2>
+      <p style="font-size:16px;color:#5b6b72;margin:0">Tratamientos completos para el cuidado y la salud de tu boca, en un solo lugar.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
+      <sc-for list="{{ services }}" as="item" hint-placeholder-count="6">
+        <div style="background:#ffffff;border:1px solid rgba(14,165,233,.12);border-radius:20px;padding:28px;box-shadow:0 8px 24px rgba(16,24,32,.05)">
+          <div style="width:48px;height:48px;border-radius:14px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;margin-bottom:18px">
+            <sc-if value="{{ item.isRing }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="none" stroke="#0284c7" stroke-width="3"></circle></svg></sc-if>
+            <sc-if value="{{ item.isDiamond }}"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" fill="#0284c7" transform="rotate(45 12 12)"></rect></svg></sc-if>
+            <sc-if value="{{ item.isCircle }}"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#0284c7"></circle></svg></sc-if>
+            <sc-if value="{{ item.isSquare }}"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="#0284c7"></rect></svg></sc-if>
+            <sc-if value="{{ item.isCross }}"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="9.5" y="3" width="5" height="18" rx="1.5" fill="#0284c7"></rect><rect x="3" y="9.5" width="18" height="5" rx="1.5" fill="#0284c7"></rect></svg></sc-if>
+          </div>
+          <h3 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:18px;margin:0 0 8px">{{ item.title }}</h3>
+          <p style="font-size:14.5px;line-height:1.55;color:#5b6b72;margin:0">{{ item.desc }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- POR QUE ELEGIRNOS -->
+  <section id="nosotros" style="padding:80px 40px;background:#f4f8f9">
+    <div style="text-align:center;max-width:560px;margin:0 auto 48px">
+      <h2 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:clamp(26px,3vw,34px);margin:0 0 12px">¿Por qué elegirnos?</h2>
+      <p style="font-size:16px;color:#5b6b72;margin:0">Cuidamos cada detalle para que tu experiencia sea tranquila y libre de estrés.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;max-width:1100px;margin:0 auto">
+      <sc-for list="{{ whyUs }}" as="item" hint-placeholder-count="4">
+        <div style="text-align:center">
+          <div style="width:56px;height:56px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 6px 16px rgba(16,24,32,.06)">
+            <sc-if value="{{ item.isRing }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="none" stroke="#0ea5e9" stroke-width="3"></circle></svg></sc-if>
+            <sc-if value="{{ item.isDiamond }}"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" fill="#0ea5e9" transform="rotate(45 12 12)"></rect></svg></sc-if>
+            <sc-if value="{{ item.isCircle }}"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#0ea5e9"></circle></svg></sc-if>
+            <sc-if value="{{ item.isSquare }}"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="#0ea5e9"></rect></svg></sc-if>
+            <sc-if value="{{ item.isCross }}"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="9.5" y="3" width="5" height="18" rx="1.5" fill="#0ea5e9"></rect><rect x="3" y="9.5" width="18" height="5" rx="1.5" fill="#0ea5e9"></rect></svg></sc-if>
+          </div>
+          <h3 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:16.5px;margin:0 0 8px">{{ item.title }}</h3>
+          <p style="font-size:14px;line-height:1.55;color:#5b6b72;margin:0">{{ item.desc }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- EQUIPO -->
+  <section id="equipo" style="padding:88px 40px">
+    <div style="text-align:center;max-width:560px;margin:0 auto 48px">
+      <h2 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:clamp(26px,3vw,34px);margin:0 0 12px">Nuestro equipo</h2>
+      <p style="font-size:16px;color:#5b6b72;margin:0">Especialistas dedicados a cuidar tu salud dental en cada visita.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px;max-width:900px;margin:0 auto">
+      <sc-for list="{{ team }}" as="item" hint-placeholder-count="3">
+        <div style="text-align:center">
+          <div style="aspect-ratio:1;border-radius:20px;background:repeating-linear-gradient(135deg,#e0f2fe 0 12px,#eaf6fd 12px 24px);display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+            <span style="font-family:ui-monospace,monospace;font-size:11.5px;color:#0284c7;background:#ffffff;padding:6px 10px;border-radius:6px">foto placeholder</span>
+          </div>
+          <h3 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:17px;margin:0 0 4px">{{ item.name }}</h3>
+          <p style="font-size:14px;color:#0284c7;font-weight:500;margin:0">{{ item.role }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- TESTIMONIOS -->
+  <section id="testimonios" style="padding:80px 40px;background:#f4f8f9">
+    <div style="text-align:center;max-width:560px;margin:0 auto 48px">
+      <h2 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:clamp(26px,3vw,34px);margin:0 0 12px">Lo que dicen nuestros pacientes</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;max-width:1100px;margin:0 auto">
+      <sc-for list="{{ testimonials }}" as="item" hint-placeholder-count="3">
+        <div style="background:#ffffff;border-radius:20px;padding:26px;box-shadow:0 8px 24px rgba(16,24,32,.05)">
+          <svg width="24" height="24" viewBox="0 0 24 24" style="margin-bottom:12px"><path d="M7 10c0-2.8 2.2-5 5-5v3c-1.1 0-2 .9-2 2h2v5H7v-5Zm9 0c0-2.8 2.2-5 5-5v3c-1.1 0-2 .9-2 2h2v5h-5v-5Z" fill="#0ea5e9"></path></svg>
+          <p style="font-size:15px;line-height:1.6;color:#425059;margin:0 0 16px;font-style:italic">"{{ item.quote }}"</p>
+          <p style="font-size:14px;font-weight:600;color:#16232b;margin:0">{{ item.name }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" style="padding:88px 40px">
+    <div style="display:flex;gap:40px;flex-wrap:wrap;max-width:1100px;margin:0 auto">
+      <div style="flex:1 1 320px;min-width:280px;background:#0ea5e9;border-radius:24px;padding:40px;color:#ffffff;display:flex;flex-direction:column;justify-content:center">
+        <h2 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:26px;margin:0 0 12px">Agenda tu cita hoy</h2>
+        <p style="font-size:15px;line-height:1.6;margin:0 0 24px;color:rgba(255,255,255,.9)">Escríbenos por WhatsApp y te confirmamos tu horario en minutos.</p>
+        <a href="{{ heroWaLink }}" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:10px;background:#ffffff;color:#0284c7;font-weight:600;font-size:16px;padding:15px 24px;border-radius:999px" style-hover="background:#f2f9fd">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#0284c7"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Z"></path></svg>
+          Escribir por WhatsApp
+        </a>
+        <p style="font-size:12px;color:rgba(255,255,255,.75);margin:16px 0 0">Número de ejemplo: {{ waPhoneDisplay }} — actualízalo antes de publicar.</p>
+      </div>
+      <form onSubmit="{{ onSubmit }}" style="flex:1 1 380px;min-width:280px;background:#f4f8f9;border-radius:24px;padding:40px;display:flex;flex-direction:column;gap:14px">
+        <h3 style="font-family:'Poppins',sans-serif;font-weight:600;font-size:20px;margin:0 0 6px">O déjanos tus datos</h3>
+        <div>
+          <input type="text" placeholder="Nombre completo" value="{{ form.nombre }}" onChange="{{ onChange.nombre }}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #d9e3e2;font-size:14.5px">
+          <sc-if value="{{ errors.nombre }}"><p style="color:#c0392b;font-size:12.5px;margin:4px 0 0">{{ errors.nombre }}</p></sc-if>
+        </div>
+        <div>
+          <input type="tel" placeholder="Teléfono" value="{{ form.telefono }}" onChange="{{ onChange.telefono }}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #d9e3e2;font-size:14.5px">
+          <sc-if value="{{ errors.telefono }}"><p style="color:#c0392b;font-size:12.5px;margin:4px 0 0">{{ errors.telefono }}</p></sc-if>
+        </div>
+        <select value="{{ form.servicio }}" onChange="{{ onChange.servicio }}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #d9e3e2;font-size:14.5px;color:#16232b;background:#ffffff">
+          <option value="">Servicio de interés (opcional)</option>
+          <sc-for list="{{ serviceOptions }}" as="opt" hint-placeholder-count="6">
+            <option value="{{ opt }}">{{ opt }}</option>
+          </sc-for>
+        </select>
+        <textarea placeholder="Mensaje (opcional)" value="{{ form.mensaje }}" onChange="{{ onChange.mensaje }}" rows="3" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #d9e3e2;font-size:14.5px;resize:vertical;font-family:inherit"></textarea>
+        <button type="submit" style="background:#0ea5e9;color:#ffffff;font-weight:600;font-size:15px;padding:13px 20px;border:none;border-radius:999px;cursor:pointer" style-hover="background:#0284c7">Enviar y continuar por WhatsApp</button>
+        <sc-if value="{{ sent }}"><p style="color:#0284c7;font-size:13.5px;margin:0">¡Listo! Te llevamos a WhatsApp para confirmar tu cita.</p></sc-if>
+      </form>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="background:#16232b;color:#cfd8dc;padding:56px 40px 32px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:36px;max-width:1100px;margin:0 auto 36px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:34px;height:34px;border-radius:10px;background:#0ea5e9;display:flex;align-items:center;justify-content:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ffffff" stroke-width="2.2"></circle></svg>
+          </div>
+          <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:17px;color:#ffffff">{{ clinicName }}</span>
+        </div>
+        <p style="font-size:14px;line-height:1.6;margin:0;color:#9fadb3">Cuidado dental cercano y profesional para toda la familia.</p>
+      </div>
+      <div>
+        <h4 style="color:#ffffff;font-size:14px;font-weight:600;margin:0 0 12px">Dirección y horario</h4>
+        <p style="font-size:14px;line-height:1.7;margin:0;color:#9fadb3">{{ address }}<br><br>{{ hoursWeekday }}<br>{{ hoursSaturday }}</p>
+      </div>
+      <div>
+        <h4 style="color:#ffffff;font-size:14px;font-weight:600;margin:0 0 12px">Contacto</h4>
+        <p style="font-size:14px;line-height:1.7;margin:0 0 12px;color:#9fadb3">{{ waPhoneDisplay }}<br>{{ email }}</p>
+        <div style="display:flex;gap:10px">
+          <a href="#" style="width:34px;height:34px;border-radius:10px;background:#1f2f38;display:flex;align-items:center;justify-content:center" style-hover="background:#0ea5e9"><span style="font-size:12px;color:#ffffff;font-family:ui-monospace,monospace">fb</span></a>
+          <a href="#" style="width:34px;height:34px;border-radius:10px;background:#1f2f38;display:flex;align-items:center;justify-content:center" style-hover="background:#0ea5e9"><span style="font-size:12px;color:#ffffff;font-family:ui-monospace,monospace">ig</span></a>
+          <a href="{{ footerWaLink }}" target="_blank" style="width:34px;height:34px;border-radius:10px;background:#0ea5e9;display:flex;align-items:center;justify-content:center"><span style="font-size:12px;color:#ffffff;font-family:ui-monospace,monospace">wa</span></a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #1f2f38;padding-top:20px;text-align:center;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center">
+      <p style="font-size:12.5px;color:#6d7b81;margin:0">© 2026 {{ clinicName }} · Datos de contacto de ejemplo — actualízalos con la información real.</p>
+      <a href="./Admin.dc.html" style="font-size:12px;color:#5b6b72;font-family:ui-monospace,monospace">panel de administración</a>
+    </div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const NAV_LINKS = [
+  { id: 'n1', href: '#servicios', label: 'Servicios' },
+  { id: 'n2', href: '#nosotros', label: 'Por qué elegirnos' },
+  { id: 'n3', href: '#equipo', label: 'Equipo' },
+  { id: 'n4', href: '#testimonios', label: 'Testimonios' },
+  { id: 'n5', href: '#contacto', label: 'Contacto' }
+];
+
+class Component extends DCLogic {
+  state = {
+    content: null,
+    form: { nombre: '', telefono: '', servicio: '', mensaje: '' },
+    errors: {},
+    sent: false
+  };
+
+  async componentDidMount() {
+    const store = await import('./dental-content-store.js');
+    this.store = store;
+    this.setState({ content: store.loadContent() });
+  }
+
+  setField(field, value) {
+    this.setState(function (s) {
+      const next = Object.assign({}, s.form);
+      next[field] = value;
+      return { form: next };
+    });
+  }
+
+  submitForm(e) {
+    e.preventDefault();
+    const form = this.state.form;
+    const errors = {};
+    if (!form.nombre.trim()) errors.nombre = 'Ingresa tu nombre';
+    if (!form.telefono.trim()) errors.telefono = 'Ingresa tu teléfono';
+    if (Object.keys(errors).length) {
+      this.setState({ errors: errors });
+      return;
+    }
+    const content = this.state.content;
+    const lines = [
+      'Hola, quiero agendar una cita en ' + content.clinicName + '.',
+      'Nombre: ' + form.nombre,
+      'Teléfono: ' + form.telefono
+    ];
+    if (form.servicio) lines.push('Servicio de interés: ' + form.servicio);
+    if (form.mensaje.trim()) lines.push('Mensaje: ' + form.mensaje.trim());
+    if (this.store) {
+      this.store.addAppointment({
+        id: 'a' + Date.now(),
+        nombre: form.nombre,
+        telefono: form.telefono,
+        servicio: form.servicio,
+        mensaje: form.mensaje,
+        createdAt: new Date().toISOString(),
+        status: 'nuevo'
+      });
+      const url = this.store.waLink(content.waPhone, lines.join('\n'));
+      window.open(url, '_blank');
+    }
+    this.setState({ errors: {}, sent: true });
+  }
+
+  renderVals() {
+    const self = this;
+    const content = this.state.content || {
+      clinicName: 'Clínica Dental Sonrisa',
+      waPhone: '52XXXXXXXXXX',
+      waPhoneDisplay: '+52 XXX XXX XXXX',
+      email: '',
+      address: '',
+      hoursWeekday: '',
+      hoursSaturday: '',
+      hero: { eyebrow: '', title: '', subtitle: '' },
+      services: [],
+      whyUs: [],
+      team: [],
+      testimonials: []
+    };
+    const shapeFlags = this.store ? this.store.shapeFlags : function () { return {}; };
+    const services = (content.services || []).map(function (s) { return Object.assign({}, s, shapeFlags(s.shape)); });
+    const whyUs = (content.whyUs || []).map(function (s) { return Object.assign({}, s, shapeFlags(s.shape)); });
+    const waLinkFn = this.store ? this.store.waLink : function () { return '#'; };
+    const heroWaLink = waLinkFn(content.waPhone, 'Hola, quiero agendar una cita en ' + content.clinicName + '.');
+
+    return {
+      clinicName: content.clinicName,
+      waPhoneDisplay: content.waPhoneDisplay,
+      email: content.email,
+      address: content.address,
+      hoursWeekday: content.hoursWeekday,
+      hoursSaturday: content.hoursSaturday,
+      hero: content.hero,
+      navLinks: NAV_LINKS,
+      services: services,
+      whyUs: whyUs,
+      team: content.team,
+      testimonials: content.testimonials,
+      serviceOptions: (content.services || []).map(function (s) { return s.title; }),
+      heroWaLink: heroWaLink,
+      footerWaLink: heroWaLink,
+      form: this.state.form,
+      errors: this.state.errors,
+      sent: this.state.sent,
+      onChange: {
+        nombre: function (e) { self.setField('nombre', e.target.value); },
+        telefono: function (e) { self.setField('telefono', e.target.value); },
+        servicio: function (e) { self.setField('servicio', e.target.value); },
+        mensaje: function (e) { self.setField('mensaje', e.target.value); }
+      },
+      onSubmit: function (e) { self.submitForm(e); }
+    };
+  }
+}
+</script>
+</body>
+</html>
