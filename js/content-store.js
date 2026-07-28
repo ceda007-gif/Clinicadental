@@ -5,12 +5,28 @@ export const SHAPE_OPTIONS = ['ring', 'diamond', 'circle', 'square', 'cross'];
 
 export const DEFAULT_CONTENT = {
   clinicName: 'Clínica Dental Sonrisa',
-  waPhone: '52XXXXXXXXXX',
-  waPhoneDisplay: '+52 XXX XXX XXXX',
-  email: 'hola@clinicasonrisa.example',
-  address: 'Av. Reforma 123, Col. Centro, Ciudad de México, CP 06000',
-  hoursWeekday: 'Lun–Vie 9:00–19:00',
-  hoursSaturday: 'Sáb 9:00–14:00',
+  branches: [
+    {
+      id: 'b1',
+      name: 'Sucursal Centro',
+      address: 'Av. Reforma 123, Col. Centro, Ciudad de México, CP 06000',
+      hoursWeekday: 'Lun–Vie 9:00–19:00',
+      hoursSaturday: 'Sáb 9:00–14:00',
+      waPhone: '52XXXXXXXXXX',
+      waPhoneDisplay: '+52 XXX XXX XXXX',
+      email: 'centro@clinicasonrisa.example'
+    },
+    {
+      id: 'b2',
+      name: 'Sucursal Norte',
+      address: 'Av. Insurgentes Norte 456, Col. Lindavista, Ciudad de México, CP 07300',
+      hoursWeekday: 'Lun–Vie 9:00–19:00',
+      hoursSaturday: 'Sáb 9:00–14:00',
+      waPhone: '52YYYYYYYYYY',
+      waPhoneDisplay: '+52 YYY YYY YYYY',
+      email: 'norte@clinicasonrisa.example'
+    }
+  ],
   hero: {
     eyebrow: 'Cuidado dental de confianza',
     title: 'Tu sonrisa está en las mejores manos',

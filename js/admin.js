@@ -9,7 +9,7 @@ const SECTIONS = [
   { id: 'servicios', label: 'Servicios' },
   { id: 'equipo', label: 'Equipo' },
   { id: 'testimonios', label: 'Testimonios' },
-  { id: 'horarios', label: 'Horarios y contacto' }
+  { id: 'sucursales', label: 'Sucursales' }
 ];
 
 const DEMO_USER = 'admin@clinicasonrisa.com';
@@ -126,7 +126,7 @@ function switchSection(id) {
   if (id === 'servicios') renderServicesForm();
   if (id === 'equipo') renderTeamForm();
   if (id === 'testimonios') renderTestimonialsForm();
-  if (id === 'horarios') renderHorariosForm();
+  if (id === 'sucursales') renderBranchesForm();
 }
 
 /* ---------- Citas ---------- */
@@ -149,6 +149,10 @@ function renderAppointments() {
         '<div class="appt-main">' +
           '<p class="name">' + escapeHtml(a.nombre) + '</p>' +
           '<p class="phone">' + escapeHtml(a.telefono) + '</p>' +
+        '</div>' +
+        '<div class="appt-col">' +
+          '<p class="label">Sucursal</p>' +
+          '<p class="value">' + escapeHtml(a.sucursalNombre || '—') + '</p>' +
         '</div>' +
         '<div class="appt-col">' +
           '<p class="label">Servicio</p>' +
@@ -380,33 +384,71 @@ function initTestimonialsForm() {
   });
 }
 
-/* ---------- Horarios y contacto ---------- */
+/* ---------- Sucursales ---------- */
 
-function renderHorariosForm() {
-  document.getElementById('infoAddress').value = state.draft.address;
-  document.getElementById('infoHoursWeekday').value = state.draft.hoursWeekday;
-  document.getElementById('infoHoursSaturday').value = state.draft.hoursSaturday;
-  document.getElementById('infoWaPhoneDisplay').value = state.draft.waPhoneDisplay;
-  document.getElementById('infoWaPhone').value = state.draft.waPhone;
-  document.getElementById('infoEmail').value = state.draft.email;
+function renderBranchesForm() {
+  const list = document.getElementById('branchesList');
+  list.innerHTML = (state.draft.branches || []).map(function (branch, idx) {
+    return (
+      '<div class="branch-admin-card" data-idx="' + idx + '">' +
+        '<div class="branch-admin-head">' +
+          '<input type="text" class="branch-name-input" value="' + escapeAttr(branch.name) + '" placeholder="Nombre de la sucursal">' +
+          '<button class="btn-delete">Eliminar</button>' +
+        '</div>' +
+        '<div class="branch-fields">' +
+          '<label>Dirección<input type="text" class="branch-address"></label>' +
+          '<label>Horario Lun–Vie<input type="text" class="branch-hours-weekday"></label>' +
+          '<label>Horario Sábado<input type="text" class="branch-hours-saturday"></label>' +
+          '<label>Teléfono a mostrar<input type="text" class="branch-wa-display"></label>' +
+          '<label>WhatsApp (solo dígitos, con código de país)<input type="text" class="branch-wa-phone" style="font-family:ui-monospace,monospace"></label>' +
+          '<label>Correo<input type="text" class="branch-email"></label>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+
+  list.querySelectorAll('.branch-admin-card').forEach(function (card) {
+    const idx = Number(card.getAttribute('data-idx'));
+    const branch = state.draft.branches[idx];
+    card.querySelector('.branch-address').value = branch.address;
+    card.querySelector('.branch-hours-weekday').value = branch.hoursWeekday;
+    card.querySelector('.branch-hours-saturday').value = branch.hoursSaturday;
+    card.querySelector('.branch-wa-display').value = branch.waPhoneDisplay;
+    card.querySelector('.branch-wa-phone').value = branch.waPhone;
+    card.querySelector('.branch-email').value = branch.email;
+
+    card.querySelector('.branch-name-input').addEventListener('input', function (e) { branch.name = e.target.value; });
+    card.querySelector('.branch-address').addEventListener('input', function (e) { branch.address = e.target.value; });
+    card.querySelector('.branch-hours-weekday').addEventListener('input', function (e) { branch.hoursWeekday = e.target.value; });
+    card.querySelector('.branch-hours-saturday').addEventListener('input', function (e) { branch.hoursSaturday = e.target.value; });
+    card.querySelector('.branch-wa-display').addEventListener('input', function (e) { branch.waPhoneDisplay = e.target.value; });
+    card.querySelector('.branch-wa-phone').addEventListener('input', function (e) { branch.waPhone = e.target.value; });
+    card.querySelector('.branch-email').addEventListener('input', function (e) { branch.email = e.target.value; });
+    card.querySelector('.btn-delete').addEventListener('click', function () {
+      state.draft.branches.splice(idx, 1);
+      renderBranchesForm();
+    });
+  });
 }
 
-function initHorariosForm() {
-  document.getElementById('infoAddress').addEventListener('input', function (e) { state.draft.address = e.target.value; });
-  document.getElementById('infoHoursWeekday').addEventListener('input', function (e) { state.draft.hoursWeekday = e.target.value; });
-  document.getElementById('infoHoursSaturday').addEventListener('input', function (e) { state.draft.hoursSaturday = e.target.value; });
-  document.getElementById('infoWaPhoneDisplay').addEventListener('input', function (e) { state.draft.waPhoneDisplay = e.target.value; });
-  document.getElementById('infoWaPhone').addEventListener('input', function (e) { state.draft.waPhone = e.target.value; });
-  document.getElementById('infoEmail').addEventListener('input', function (e) { state.draft.email = e.target.value; });
-  document.getElementById('saveInfoBtn').addEventListener('click', function () {
-    state.content.address = state.draft.address;
-    state.content.hoursWeekday = state.draft.hoursWeekday;
-    state.content.hoursSaturday = state.draft.hoursSaturday;
-    state.content.waPhoneDisplay = state.draft.waPhoneDisplay;
-    state.content.waPhone = state.draft.waPhone;
-    state.content.email = state.draft.email;
+function initBranchesForm() {
+  document.getElementById('addBranchBtn').addEventListener('click', function () {
+    state.draft.branches.push({
+      id: newId('b'),
+      name: 'Nueva sucursal',
+      address: 'Dirección de la sucursal',
+      hoursWeekday: 'Lun–Vie 9:00–19:00',
+      hoursSaturday: 'Sáb 9:00–14:00',
+      waPhone: '52XXXXXXXXXX',
+      waPhoneDisplay: '+52 XXX XXX XXXX',
+      email: 'sucursal@clinicasonrisa.example'
+    });
+    renderBranchesForm();
+  });
+  document.getElementById('saveBranchesBtn').addEventListener('click', function () {
+    state.content.branches = JSON.parse(JSON.stringify(state.draft.branches));
     saveContent(state.content);
-    flashSaved('horarios');
+    flashSaved('sucursales');
   });
 }
 
@@ -417,4 +459,4 @@ initHeroForm();
 initServicesForm();
 initTeamForm();
 initTestimonialsForm();
-initHorariosForm();
+initBranchesForm();

@@ -35,10 +35,11 @@
       <a href="#servicios">Servicios</a>
       <a href="#nosotros">Por qué elegirnos</a>
       <a href="#equipo">Equipo</a>
+      <a href="#sucursales">Sucursales</a>
       <a href="#testimonios">Testimonios</a>
       <a href="#contacto">Contacto</a>
     </nav>
-    <a id="headerCta" class="btn btn-primary header-cta" target="_blank" rel="noopener">Agendar cita</a>
+    <a href="#sucursales" class="btn btn-primary header-cta">Agendar cita</a>
   </header>
 
   <main>
@@ -49,13 +50,13 @@
         <h1 class="hero-title" id="heroTitle"></h1>
         <p class="hero-subtitle" id="heroSubtitle"></p>
         <div class="hero-actions">
-          <a id="heroWaCta" class="btn btn-primary" target="_blank" rel="noopener">
+          <a href="#sucursales" class="btn btn-primary">
             <span id="heroWaIcon"></span>
-            Agendar cita por WhatsApp
+            Ver sucursales y agendar
           </a>
           <a href="#servicios" class="btn btn-outline">Ver servicios</a>
         </div>
-        <p class="hero-disclaimer">Número de WhatsApp de ejemplo — reemplázalo con el de tu clínica antes de publicar.</p>
+        <p class="hero-disclaimer">Datos de sucursales de ejemplo — reemplázalos con los de tu clínica antes de publicar.</p>
       </div>
       <div class="hero-media">
         <div class="image-placeholder" id="heroImagePlaceholder"><span>foto de consultorio / equipo</span></div>
@@ -89,6 +90,15 @@
       <div class="team-grid" id="teamGrid"></div>
     </section>
 
+    <!-- SUCURSALES -->
+    <section id="sucursales" class="section-alt">
+      <div class="section-heading">
+        <h2>Nuestras sucursales</h2>
+        <p>Elige la sucursal más cercana y agenda tu cita directo por WhatsApp.</p>
+      </div>
+      <div class="branches-grid" id="branchesGrid"></div>
+    </section>
+
     <!-- TESTIMONIOS -->
     <section id="testimonios" class="section-alt">
       <div class="section-heading">
@@ -102,15 +112,17 @@
       <div class="contact-wrap">
         <div class="contact-panel">
           <h2>Agenda tu cita hoy</h2>
-          <p>Escríbenos por WhatsApp y te confirmamos tu horario en minutos.</p>
-          <a id="contactWaCta" class="btn" target="_blank" rel="noopener">
-            <span id="contactWaIcon"></span>
-            Escribir por WhatsApp
-          </a>
-          <p class="fineprint">Número de ejemplo: <span id="waPhoneDisplayContact"></span> — actualízalo antes de publicar.</p>
+          <p>Escríbenos por WhatsApp a la sucursal de tu preferencia y te confirmamos tu horario en minutos.</p>
+          <div class="contact-branches-list" id="contactBranchesList"></div>
         </div>
         <form id="contactForm" class="contact-form" novalidate>
           <h3>O déjanos tus datos</h3>
+          <div class="field">
+            <select id="fieldSucursal">
+              <option value="">Selecciona una sucursal</option>
+            </select>
+            <p class="field-error hidden" id="errorSucursal"></p>
+          </div>
           <div class="field">
             <input type="text" id="fieldNombre" placeholder="Nombre completo">
             <p class="field-error hidden" id="errorNombre"></p>
@@ -140,17 +152,12 @@
         </div>
         <p>Cuidado dental cercano y profesional para toda la familia.</p>
       </div>
+      <div id="footerBranches" class="contents"></div>
       <div class="col">
-        <h4>Dirección y horario</h4>
-        <p id="footerAddress"></p>
-      </div>
-      <div class="col">
-        <h4>Contacto</h4>
-        <p id="footerContact"></p>
+        <h4>Síguenos</h4>
         <div class="social-row">
           <a href="#" class="social-btn"><span>fb</span></a>
           <a href="#" class="social-btn"><span>ig</span></a>
-          <a id="footerWaCta" href="#" target="_blank" rel="noopener" class="social-btn wa"><span>wa</span></a>
         </div>
       </div>
     </div>

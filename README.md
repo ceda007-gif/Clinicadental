@@ -1,8 +1,9 @@
 # Clínica Dental Sonrisa — Landing Page + Panel de Administración
 
-Landing page de marketing para una clínica dental (servicios, por qué elegirnos, equipo,
-testimonios, contacto/cita vía WhatsApp) más un panel de administración ligero para editar
-el contenido del sitio y ver los leads de citas.
+Landing page de marketing para una clínica dental con **dos sucursales** (servicios, por qué
+elegirnos, equipo y testimonios compartidos por la marca; dirección, horario, WhatsApp y
+correo independientes por sucursal) más un panel de administración ligero para editar el
+contenido del sitio y ver los leads de citas.
 
 Recreado a partir de un handoff de diseño de alta fidelidad (`design_handoff_dental_clinic/`)
 como HTML/CSS/JS estático, sin build step.
@@ -44,12 +45,16 @@ un backend o CMS.
 
 ## Datos de ejemplo pendientes de reemplazar
 
-Antes de publicar, actualiza (vía el panel de administración o `js/content-store.js`):
+Antes de publicar, actualiza (vía el panel de administración, sección **Sucursales**, o
+`js/content-store.js`):
 
-- Número de WhatsApp (`waPhone` / `waPhoneDisplay`)
-- Correo, dirección y horarios
+- Nombre, dirección, horarios, correo y número de WhatsApp de cada sucursal
 - Teléfono y dirección del JSON-LD y meta tags en `index.html`
 - Fotografías (actualmente hay placeholders con patrón de rayas)
+
+Se puede agregar o quitar sucursales desde el mismo panel ("+ Agregar sucursal" / "Eliminar").
+Servicios, equipo y testimonios son compartidos por ambas sucursales; si necesitas que
+varíen por sucursal, hay que extender el modelo de datos.
 
 ## Almacenamiento
 

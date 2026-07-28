@@ -137,33 +137,19 @@
         </div>
       </section>
 
-      <!-- HORARIOS Y CONTACTO -->
-      <section id="view-horarios" class="admin-view hidden">
-        <h1>Horarios y contacto</h1>
-        <p class="subtitle">Información que aparece en el pie de página y en los botones de WhatsApp.</p>
-        <div class="admin-panel">
-          <label>Dirección
-            <input type="text" id="infoAddress">
-          </label>
-          <label>Horario Lun–Vie
-            <input type="text" id="infoHoursWeekday">
-          </label>
-          <label>Horario Sábado
-            <input type="text" id="infoHoursSaturday">
-          </label>
-          <label>Teléfono a mostrar
-            <input type="text" id="infoWaPhoneDisplay">
-          </label>
-          <label>Número de WhatsApp (solo dígitos, con código de país)
-            <input type="text" id="infoWaPhone" style="font-family:ui-monospace,monospace">
-          </label>
-          <label>Correo
-            <input type="text" id="infoEmail">
-          </label>
+      <!-- SUCURSALES -->
+      <section id="view-sucursales" class="admin-view hidden">
+        <div class="admin-header-row">
           <div>
-            <button class="btn btn-admin admin-save" id="saveInfoBtn">Guardar cambios</button>
-            <span class="saved-flag hidden" id="savedHorarios">Guardado ✓</span>
+            <h1>Sucursales</h1>
+            <p>Direcciones, horarios y WhatsApp de cada sucursal. Aparecen en la landing y en el formulario de citas.</p>
           </div>
+          <button class="btn btn-admin" id="addBranchBtn">+ Agregar sucursal</button>
+        </div>
+        <div id="branchesList" class="admin-list"></div>
+        <div>
+          <button class="btn btn-admin admin-save" id="saveBranchesBtn">Guardar cambios</button>
+          <span class="saved-flag hidden" id="savedSucursales">Guardado ✓</span>
         </div>
       </section>
 

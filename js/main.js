@@ -3,8 +3,18 @@ import { shapeIconSVG, checkLogoSVG, whatsappSVG } from './icons.js';
 
 const content = loadContent();
 
-function heroMessage() {
-  return 'Hola, quiero agendar una cita en ' + content.clinicName + '.';
+function branches() {
+  return content.branches || [];
+}
+
+function findBranch(id) {
+  return branches().find(function (b) { return b.id === id; }) || null;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
 }
 
 function renderHeader() {
@@ -12,14 +22,6 @@ function renderHeader() {
   document.getElementById('footerBrandMark').innerHTML = checkLogoSVG('#ffffff', 18);
   document.getElementById('clinicName').textContent = content.clinicName;
   document.getElementById('footerClinicName').textContent = content.clinicName;
-
-  const link = waLink(content.waPhone, heroMessage());
-  document.getElementById('headerCta').href = link;
-  document.getElementById('heroWaCta').href = link;
-  document.getElementById('contactWaCta').href = link;
-  document.getElementById('footerWaCta').href = link;
-  document.getElementById('heroWaIcon').innerHTML = whatsappSVG('#ffffff', 18);
-  document.getElementById('contactWaIcon').innerHTML = whatsappSVG('#0284c7', 18);
 }
 
 function renderHero() {
@@ -84,6 +86,46 @@ function renderTeam() {
   }).join('');
 }
 
+function branchWaMessage(branch) {
+  return 'Hola, quiero agendar una cita en ' + content.clinicName + ' (' + branch.name + ').';
+}
+
+function renderBranches() {
+  const grid = document.getElementById('branchesGrid');
+  grid.innerHTML = branches().map(function (branch) {
+    const link = waLink(branch.waPhone, branchWaMessage(branch));
+    return (
+      '<div class="branch-card">' +
+        '<h3>' + escapeHtml(branch.name) + '</h3>' +
+        '<p class="branch-address">' + escapeHtml(branch.address) + '</p>' +
+        '<p class="branch-hours">' + escapeHtml(branch.hoursWeekday) + '<br>' + escapeHtml(branch.hoursSaturday) + '</p>' +
+        '<a href="' + link + '" target="_blank" rel="noopener" class="btn btn-primary branch-wa-btn">' +
+          whatsappSVG('#ffffff', 16) + ' ' + escapeHtml(branch.waPhoneDisplay) +
+        '</a>' +
+      '</div>'
+    );
+  }).join('');
+
+  const contactList = document.getElementById('contactBranchesList');
+  contactList.innerHTML = branches().map(function (branch) {
+    const link = waLink(branch.waPhone, branchWaMessage(branch));
+    return (
+      '<a href="' + link + '" target="_blank" rel="noopener" class="contact-branch-btn">' +
+        whatsappSVG('#0284c7', 16) +
+        '<span>' + escapeHtml(branch.name) + '<small>' + escapeHtml(branch.waPhoneDisplay) + '</small></span>' +
+      '</a>'
+    );
+  }).join('');
+
+  const select = document.getElementById('fieldSucursal');
+  branches().forEach(function (branch) {
+    const opt = document.createElement('option');
+    opt.value = branch.id;
+    opt.textContent = branch.name;
+    select.appendChild(opt);
+  });
+}
+
 function renderTestimonials() {
   const grid = document.getElementById('testimonialsGrid');
   grid.innerHTML = (content.testimonials || []).map(function (item) {
@@ -98,27 +140,31 @@ function renderTestimonials() {
 }
 
 function renderFooterInfo() {
-  document.getElementById('footerAddress').innerHTML =
-    escapeHtml(content.address) + '<br><br>' + escapeHtml(content.hoursWeekday) + '<br>' + escapeHtml(content.hoursSaturday);
-  document.getElementById('footerContact').innerHTML =
-    escapeHtml(content.waPhoneDisplay) + '<br>' + escapeHtml(content.email);
-  document.getElementById('waPhoneDisplayContact').textContent = content.waPhoneDisplay;
-  document.getElementById('footerCopyright').textContent =
-    '© ' + new Date().getFullYear() + ' ' + content.clinicName + ' · Datos de contacto de ejemplo — actualízalos con la información real.';
-}
+  const container = document.getElementById('footerBranches');
+  container.innerHTML = branches().map(function (branch) {
+    return (
+      '<div class="col">' +
+        '<h4>' + escapeHtml(branch.name) + '</h4>' +
+        '<p>' + escapeHtml(branch.address) + '<br><br>' +
+          escapeHtml(branch.hoursWeekday) + '<br>' + escapeHtml(branch.hoursSaturday) + '<br><br>' +
+          escapeHtml(branch.waPhoneDisplay) + '<br>' + escapeHtml(branch.email) +
+        '</p>' +
+      '</div>'
+    );
+  }).join('');
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str == null ? '' : String(str);
-  return div.innerHTML;
+  document.getElementById('footerCopyright').textContent =
+    '© ' + new Date().getFullYear() + ' ' + content.clinicName + ' · Datos de sucursales de ejemplo — actualízalos con la información real.';
 }
 
 function setupContactForm() {
   const form = document.getElementById('contactForm');
+  const sucursalSelect = document.getElementById('fieldSucursal');
   const nombreInput = document.getElementById('fieldNombre');
   const telefonoInput = document.getElementById('fieldTelefono');
   const servicioSelect = document.getElementById('fieldServicio');
   const mensajeInput = document.getElementById('fieldMensaje');
+  const errorSucursal = document.getElementById('errorSucursal');
   const errorNombre = document.getElementById('errorNombre');
   const errorTelefono = document.getElementById('errorTelefono');
   const successMsg = document.getElementById('formSuccess');
@@ -126,12 +172,21 @@ function setupContactForm() {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
+    const sucursalId = sucursalSelect.value;
     const nombre = nombreInput.value;
     const telefono = telefonoInput.value;
     const servicio = servicioSelect.value;
     const mensaje = mensajeInput.value;
+    const branch = findBranch(sucursalId);
 
     let hasError = false;
+    if (!branch) {
+      errorSucursal.textContent = 'Selecciona una sucursal';
+      errorSucursal.classList.remove('hidden');
+      hasError = true;
+    } else {
+      errorSucursal.classList.add('hidden');
+    }
     if (!nombre.trim()) {
       errorNombre.textContent = 'Ingresa tu nombre';
       errorNombre.classList.remove('hidden');
@@ -152,7 +207,7 @@ function setupContactForm() {
     }
 
     const lines = [
-      'Hola, quiero agendar una cita en ' + content.clinicName + '.',
+      'Hola, quiero agendar una cita en ' + content.clinicName + ' (' + branch.name + ').',
       'Nombre: ' + nombre,
       'Teléfono: ' + telefono
     ];
@@ -161,6 +216,8 @@ function setupContactForm() {
 
     addAppointment({
       id: newId('a'),
+      sucursalId: branch.id,
+      sucursalNombre: branch.name,
       nombre: nombre,
       telefono: telefono,
       servicio: servicio,
@@ -169,7 +226,7 @@ function setupContactForm() {
       status: 'nuevo'
     });
 
-    window.open(waLink(content.waPhone, lines.join('\n')), '_blank');
+    window.open(waLink(branch.waPhone, lines.join('\n')), '_blank');
     successMsg.classList.remove('hidden');
   });
 }
@@ -179,6 +236,7 @@ renderHero();
 renderServices();
 renderWhyUs();
 renderTeam();
+renderBranches();
 renderTestimonials();
 renderFooterInfo();
 setupContactForm();
