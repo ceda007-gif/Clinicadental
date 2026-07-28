@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', 'data', 'db.json');
 
-const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches', 'assistantInstructions'];
+const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches', 'assistantInstructions', 'gallery'];
 
 const SEED = {
   clinicName: 'Clínica Dental Sonrisa',
@@ -16,6 +16,7 @@ const SEED = {
     subtitle: 'Atención dental cercana y profesional para toda la familia. Tecnología moderna, doctores certificados y horarios que se adaptan a ti.'
   },
   heroImage: null,
+  gallery: [],
   whyUs: [
     { id: 'w1', shape: 'circle', title: 'Tecnología moderna', desc: 'Equipos digitales de diagnóstico para tratamientos más precisos.' },
     { id: 'w2', shape: 'cross', title: 'Doctores certificados', desc: 'Especialistas con años de experiencia y formación continua.' },

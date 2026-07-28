@@ -9,6 +9,7 @@ const SECTIONS = [
   { id: 'hero', label: 'Hero' },
   { id: 'servicios', label: 'Servicios' },
   { id: 'equipo', label: 'Equipo' },
+  { id: 'galeria', label: 'Galería' },
   { id: 'testimonios', label: 'Testimonios' },
   { id: 'sucursales', label: 'Sucursales' },
   { id: 'asistente', label: 'Asistente IA' }
@@ -167,6 +168,7 @@ function switchSection(id) {
   if (id === 'hero') renderHeroForm();
   if (id === 'servicios') renderServicesForm();
   if (id === 'equipo') renderTeamForm();
+  if (id === 'galeria') renderGalleryForm();
   if (id === 'testimonios') renderTestimonialsForm();
   if (id === 'sucursales') renderBranchesForm();
   if (id === 'asistente') renderAssistantForm();
@@ -426,6 +428,77 @@ function initTeamForm() {
   });
 }
 
+/* ---------- Galería ---------- */
+
+function renderGalleryForm() {
+  const list = document.getElementById('galleryList');
+  const gallery = state.draft.gallery || [];
+  if (!gallery.length) {
+    list.innerHTML = '<div class="admin-empty">Aún no hay fotos. Usa "+ Agregar foto" para subir la primera.</div>';
+    return;
+  }
+
+  list.innerHTML = gallery.map(function (item, idx) {
+    return (
+      '<div class="admin-card" data-idx="' + idx + '">' +
+        '<div class="photo-field">' +
+          '<div class="photo-preview"><img src="' + item.image + '" alt=""></div>' +
+          '<div class="photo-field-actions">' +
+            '<label class="btn btn-admin btn-file">Cambiar<input type="file" class="gallery-photo-input" accept="image/*" hidden></label>' +
+          '</div>' +
+        '</div>' +
+        '<input type="text" class="gallery-caption" value="' + escapeAttr(item.caption || '') + '" placeholder="Descripción (opcional)" style="flex:1 1 200px;min-width:160px">' +
+        '<button class="btn-delete">Eliminar</button>' +
+      '</div>'
+    );
+  }).join('');
+
+  list.querySelectorAll('.admin-card').forEach(function (card) {
+    const idx = Number(card.getAttribute('data-idx'));
+    card.querySelector('.gallery-caption').addEventListener('input', function (e) { state.draft.gallery[idx].caption = e.target.value; });
+    card.querySelector('.btn-delete').addEventListener('click', function () {
+      state.draft.gallery.splice(idx, 1);
+      renderGalleryForm();
+    });
+    card.querySelector('.gallery-photo-input').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      readImageFile(file).then(function (dataUrl) {
+        state.draft.gallery[idx].image = dataUrl;
+        renderGalleryForm();
+      }).catch(function (err) {
+        alert(err.message);
+      });
+    });
+  });
+}
+
+function initGalleryForm() {
+  const errorEl = document.getElementById('galleryAddError');
+  document.getElementById('addGalleryInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    readImageFile(file).then(function (dataUrl) {
+      errorEl.classList.add('hidden');
+      state.draft.gallery.push({ id: newId('g'), image: dataUrl, caption: '' });
+      renderGalleryForm();
+    }).catch(function (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    });
+  });
+  document.getElementById('saveGalleryBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({ gallery: JSON.parse(JSON.stringify(state.draft.gallery)) });
+      flashSaved('galeria');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
+  });
+}
+
 /* ---------- Testimonios ---------- */
 
 function renderTestimonialsForm() {
@@ -563,6 +636,7 @@ initLogin();
 initHeroForm();
 initServicesForm();
 initTeamForm();
+initGalleryForm();
 initTestimonialsForm();
 initBranchesForm();
 initAssistantForm();

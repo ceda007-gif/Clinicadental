@@ -86,6 +86,56 @@ function renderTeam() {
   }).join('');
 }
 
+function renderGallery() {
+  const section = document.getElementById('galeria');
+  const gallery = content.gallery || [];
+  if (!gallery.length) {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+
+  const grid = document.getElementById('galleryGrid');
+  grid.innerHTML = gallery.map(function (item, idx) {
+    return (
+      '<button type="button" class="gallery-item" data-idx="' + idx + '">' +
+        '<img src="' + item.image + '" alt="' + escapeHtml(item.caption || content.clinicName) + '" loading="lazy">' +
+      '</button>'
+    );
+  }).join('');
+
+  grid.querySelectorAll('.gallery-item').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const item = gallery[Number(btn.getAttribute('data-idx'))];
+      openLightbox(item);
+    });
+  });
+}
+
+function openLightbox(item) {
+  const lightbox = document.getElementById('galleryLightbox');
+  document.getElementById('lightboxImage').src = item.image;
+  document.getElementById('lightboxImage').alt = item.caption || content.clinicName;
+  const caption = document.getElementById('lightboxCaption');
+  caption.textContent = item.caption || '';
+  caption.classList.toggle('hidden', !item.caption);
+  lightbox.classList.remove('hidden');
+}
+
+function closeLightbox() {
+  document.getElementById('galleryLightbox').classList.add('hidden');
+}
+
+function setupLightbox() {
+  document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+  document.getElementById('galleryLightbox').addEventListener('click', function (e) {
+    if (e.target.id === 'galleryLightbox') closeLightbox();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+}
+
 function branchWaMessage(branch) {
   return 'Hola, quiero agendar una cita en ' + content.clinicName + ' (' + branch.name + ').';
 }
@@ -236,7 +286,9 @@ renderHero();
 renderServices();
 renderWhyUs();
 renderTeam();
+renderGallery();
 renderBranches();
 renderTestimonials();
 renderFooterInfo();
 setupContactForm();
+setupLightbox();

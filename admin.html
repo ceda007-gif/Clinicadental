@@ -121,6 +121,26 @@
         </div>
       </section>
 
+      <!-- GALERÍA -->
+      <section id="view-galeria" class="admin-view hidden">
+        <div class="admin-header-row">
+          <div>
+            <h1>Galería</h1>
+            <p>Fotos del consultorio, equipo o resultados que se muestran en la landing.</p>
+          </div>
+          <label class="btn btn-admin btn-file">
+            + Agregar foto
+            <input type="file" id="addGalleryInput" accept="image/*" hidden>
+          </label>
+        </div>
+        <p class="field-error hidden" id="galleryAddError"></p>
+        <div id="galleryList" class="admin-list"></div>
+        <div>
+          <button class="btn btn-admin admin-save" id="saveGalleryBtn">Guardar cambios</button>
+          <span class="saved-flag hidden" id="savedGaleria">Guardado ✓</span>
+        </div>
+      </section>
+
       <!-- TESTIMONIOS -->
       <section id="view-testimonios" class="admin-view hidden">
         <div class="admin-header-row">

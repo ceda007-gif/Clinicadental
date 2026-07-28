@@ -1,9 +1,9 @@
 # Clínica Dental Sonrisa — Landing Page + Panel de Administración
 
 Landing page de marketing para una clínica dental con **dos sucursales** (servicios, por qué
-elegirnos, equipo y testimonios compartidos por la marca; dirección, horario, WhatsApp y
-correo independientes por sucursal) más un panel de administración ligero para editar el
-contenido del sitio y ver los leads de citas.
+elegirnos, equipo, galería de fotos y testimonios compartidos por la marca; dirección,
+horario, WhatsApp y correo independientes por sucursal) más un panel de administración
+ligero para editar el contenido del sitio y ver los leads de citas.
 
 Recreado a partir de un handoff de diseño de alta fidelidad (`design_handoff_dental_clinic/`)
 como HTML/CSS/JS estático, sin build step.
