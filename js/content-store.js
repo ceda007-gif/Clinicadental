@@ -7,6 +7,7 @@ export const SHAPE_OPTIONS = ['ring', 'diamond', 'circle', 'square', 'cross'];
 
 export const DEFAULT_CONTENT = {
   clinicName: 'Clínica Dental Sonrisa',
+  assistantInstructions: '',
   branches: [
     {
       id: 'b1',

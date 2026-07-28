@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import { getBranches, getServices, addAppointment, getClinicName } from './db.js';
+import { getBranches, getServices, addAppointment, getClinicName, getAssistantInstructions } from './db.js';
 import { getFreeSlots, isSlotFree, AvailabilityError } from './availability.js';
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
@@ -127,7 +127,9 @@ function runTool(name, input) {
 function systemPrompt() {
   const clinicName = getClinicName();
   const today = new Date().toISOString().slice(0, 10);
-  return (
+  const customInstructions = getAssistantInstructions();
+
+  let prompt = (
     'Eres el asistente de agendado de citas de "' + clinicName + '", una clínica dental con varias sucursales. ' +
     'Hoy es ' + today + '. Hablas en español, de forma breve, cálida y profesional (como WhatsApp, sin formalismos excesivos).\n\n' +
     'Objetivo de la conversación: agendar una cita. Debes reunir, en este orden flexible según lo que el paciente ya haya dicho:\n' +
@@ -139,6 +141,16 @@ function systemPrompt() {
     'Después de agendar, confirma con un resumen claro (sucursal, servicio, fecha, hora) y avisa que la clínica puede contactarlo por WhatsApp o correo para confirmar. ' +
     'Si el paciente pide algo fuera de agendar citas (dudas médicas complejas, quejas, etc.), responde con empatía y sugiere que lo hablará el personal de la clínica, sin dar diagnósticos médicos.'
   );
+
+  if (customInstructions.trim()) {
+    prompt += (
+      '\n\nInstrucciones adicionales del negocio (síguelas para el tono, promociones, políticas u ' +
+      'otras reglas propias de esta clínica — pero nunca dejes de usar check_availability antes de ' +
+      'ofrecer horarios, ni inventes disponibilidad):\n' + customInstructions.trim()
+    );
+  }
+
+  return prompt;
 }
 
 export async function runChat(history, userMessage) {

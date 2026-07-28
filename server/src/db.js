@@ -5,10 +5,11 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', 'data', 'db.json');
 
-const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches'];
+const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches', 'assistantInstructions'];
 
 const SEED = {
   clinicName: 'Clínica Dental Sonrisa',
+  assistantInstructions: '',
   hero: {
     eyebrow: 'Cuidado dental de confianza',
     title: 'Tu sonrisa está en las mejores manos',
@@ -163,6 +164,10 @@ export function getClinicContent() {
   const content = {};
   CONTENT_KEYS.forEach(function (key) { content[key] = db[key]; });
   return content;
+}
+
+export function getAssistantInstructions() {
+  return readDb().assistantInstructions || '';
 }
 
 export function updateClinicContent(patch) {

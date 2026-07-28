@@ -10,7 +10,8 @@ const SECTIONS = [
   { id: 'servicios', label: 'Servicios' },
   { id: 'equipo', label: 'Equipo' },
   { id: 'testimonios', label: 'Testimonios' },
-  { id: 'sucursales', label: 'Sucursales' }
+  { id: 'sucursales', label: 'Sucursales' },
+  { id: 'asistente', label: 'Asistente IA' }
 ];
 
 const DEMO_USER = 'admin@clinicasonrisa.com';
@@ -168,6 +169,7 @@ function switchSection(id) {
   if (id === 'equipo') renderTeamForm();
   if (id === 'testimonios') renderTestimonialsForm();
   if (id === 'sucursales') renderBranchesForm();
+  if (id === 'asistente') renderAssistantForm();
 }
 
 /* ---------- Citas ---------- */
@@ -535,6 +537,26 @@ function initBranchesForm() {
   });
 }
 
+/* ---------- Asistente IA ---------- */
+
+function renderAssistantForm() {
+  document.getElementById('assistantInstructionsInput').value = state.draft.assistantInstructions || '';
+}
+
+function initAssistantForm() {
+  document.getElementById('assistantInstructionsInput').addEventListener('input', function (e) {
+    state.draft.assistantInstructions = e.target.value;
+  });
+  document.getElementById('saveAssistantBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({ assistantInstructions: state.draft.assistantInstructions || '' });
+      flashSaved('asistente');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
+  });
+}
+
 /* ---------- Init ---------- */
 
 initLogin();
@@ -543,3 +565,4 @@ initServicesForm();
 initTeamForm();
 initTestimonialsForm();
 initBranchesForm();
+initAssistantForm();

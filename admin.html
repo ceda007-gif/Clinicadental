@@ -153,6 +153,25 @@
         </div>
       </section>
 
+      <!-- ASISTENTE IA -->
+      <section id="view-asistente" class="admin-view hidden">
+        <h1>Asistente de citas (IA)</h1>
+        <p class="subtitle">
+          Instrucciones adicionales para el bot de chat: tono, promociones, políticas de la
+          clínica, cosas que debe o no debe decir, etc. Se suman a sus reglas básicas de
+          agendado (que siempre consulte disponibilidad real y nunca invente horarios).
+        </p>
+        <div class="admin-panel">
+          <label>Instrucciones adicionales
+            <textarea id="assistantInstructionsInput" rows="8" placeholder="Ej: Si preguntan por precios, di que varían según el diagnóstico y que se cotizan en la valoración. Menciona que los sábados hay 20% de descuento en limpieza dental. Sé cercano pero no uses emojis en exceso."></textarea>
+          </label>
+          <div>
+            <button class="btn btn-admin admin-save" id="saveAssistantBtn">Guardar cambios</button>
+            <span class="saved-flag hidden" id="savedAsistente">Guardado ✓</span>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
