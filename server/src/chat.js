@@ -2,7 +2,16 @@ import { GoogleGenAI } from '@google/genai';
 import { getBranches, getServices, addAppointment, getClinicName, getAssistantInstructions } from './db.js';
 import { getFreeSlots, isSlotFree, AvailabilityError } from './availability.js';
 
-const MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+// Free-tier rate limits (and model availability) are tracked per model, so
+// when one is saturated or unavailable, jumping to the next gives it its own
+// separate quota instead of waiting out the same one. Order = preference.
+const MODELS = Array.from(new Set([
+  process.env.GEMINI_MODEL,
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite'
+].filter(Boolean)));
+
 const MAX_TOOL_ITERATIONS = 6;
 
 function newAppointmentId() {
@@ -153,36 +162,31 @@ function systemPrompt() {
   return prompt;
 }
 
-function sleep(ms) {
-  return new Promise(function (resolve) { setTimeout(resolve, ms); });
-}
-
 function isQuotaError(err) {
   return Boolean(err) && (err.status === 429 || /RESOURCE_EXHAUSTED/.test(String(err.message || '')));
 }
 
-function parseRetryDelaySeconds(err) {
-  const match = /"retryDelay":"(\d+(?:\.\d+)?)s"/.exec(String(err && err.message || ''));
-  return match ? Math.min(Number(match[1]), 15) : 5;
+function isModelUnavailableError(err) {
+  return Boolean(err) && (err.status === 404 || /NOT_FOUND/.test(String(err.message || '')));
 }
 
-// The free Gemini tier allows very few requests per minute, and a single
-// conversation turn can make several (one per tool call). A transient 429
-// there is expected, not a bug — retry once or twice using the delay Google
-// itself suggests before giving up.
-async function generateWithRetry(client, params) {
-  const maxAttempts = 3;
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+// Free-tier quota (and model availability) is tracked per model, so on a 429
+// or "model not found", jump straight to the next model in MODELS instead of
+// waiting out the same one's limit — it has its own separate quota. Only
+// bails out immediately on errors a different model wouldn't fix (bad key,
+// malformed request, etc.).
+async function generateWithFallback(client, baseParams) {
+  let lastErr = null;
+  for (const model of MODELS) {
     try {
-      return await client.models.generateContent(params);
+      return await client.models.generateContent(Object.assign({}, baseParams, { model: model }));
     } catch (err) {
-      if (isQuotaError(err) && attempt < maxAttempts) {
-        await sleep(parseRetryDelaySeconds(err) * 1000);
-        continue;
-      }
+      lastErr = err;
+      if (isQuotaError(err) || isModelUnavailableError(err)) continue;
       throw err;
     }
   }
+  throw lastErr;
 }
 
 export async function runChat(history, userMessage) {
@@ -199,8 +203,7 @@ export async function runChat(history, userMessage) {
 
   try {
     for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
-      const response = await generateWithRetry(client, {
-        model: MODEL,
+      const response = await generateWithFallback(client, {
         contents: contents,
         config: {
           systemInstruction: systemPrompt(),
