@@ -2,6 +2,7 @@ import {
   loadContent, saveContent, loadAppointments, saveAppointments, newId, readImageFile
 } from './content-store.js';
 import { checkLogoSVG } from './icons.js';
+import { API_BASE, ADMIN_TOKEN } from './config.js';
 
 const SECTIONS = [
   { id: 'citas', label: 'Citas' },
@@ -20,9 +21,45 @@ const state = {
   section: 'citas',
   content: loadContent(),
   draft: null,
-  appointments: loadAppointments()
+  appointments: loadAppointments(),
+  remoteAppointments: []
 };
 state.draft = JSON.parse(JSON.stringify(state.content));
+
+function branchNameById(branchId) {
+  const branch = (state.content.branches || []).find(function (b) { return b.id === branchId; });
+  return branch ? branch.name : null;
+}
+
+function normalizeAppt(a, isRemote) {
+  return {
+    id: a.id,
+    remote: isRemote,
+    sucursalNombre: a.sucursalNombre || branchNameById(a.branchId) || '—',
+    nombre: a.nombre || '—',
+    phone: a.telefono || a.whatsapp || '—',
+    servicio: a.servicio || a.service || '',
+    mensaje: a.mensaje || a.notes || '',
+    fecha: a.date ? (a.date + (a.time ? ' ' + a.time : '')) : '',
+    createdAt: a.createdAt,
+    status: a.status || 'nuevo',
+    source: a.source || (isRemote ? 'chat' : 'form')
+  };
+}
+
+async function fetchRemoteAppointments() {
+  if (!API_BASE && window.location.protocol !== 'http:' && window.location.protocol !== 'https:') return [];
+  try {
+    const res = await fetch(API_BASE + '/api/appointments', {
+      headers: { Authorization: 'Bearer ' + ADMIN_TOKEN }
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (e) {
+    return [];
+  }
+}
 
 function fmtDate(iso) {
   try {
@@ -131,28 +168,34 @@ function switchSection(id) {
 
 /* ---------- Citas ---------- */
 
-function renderAppointments() {
+async function renderAppointments() {
   const list = document.getElementById('appointmentsList');
   const empty = document.getElementById('appointmentsEmpty');
-  const appointments = state.appointments;
 
-  if (!appointments.length) {
+  state.remoteAppointments = await fetchRemoteAppointments();
+
+  const merged = state.appointments.map(function (a) { return normalizeAppt(a, false); })
+    .concat(state.remoteAppointments.map(function (a) { return normalizeAppt(a, true); }))
+    .sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+
+  if (!merged.length) {
     list.innerHTML = '';
     empty.classList.remove('hidden');
     return;
   }
   empty.classList.add('hidden');
 
-  list.innerHTML = appointments.map(function (a) {
+  list.innerHTML = merged.map(function (a) {
+    const sourceLabel = a.source === 'chat' ? 'Asistente IA' : 'Formulario';
     return (
-      '<div class="admin-card appt-card" data-id="' + escapeAttr(a.id) + '">' +
+      '<div class="admin-card appt-card" data-id="' + escapeAttr(a.id) + '" data-remote="' + (a.remote ? '1' : '0') + '">' +
         '<div class="appt-main">' +
           '<p class="name">' + escapeHtml(a.nombre) + '</p>' +
-          '<p class="phone">' + escapeHtml(a.telefono) + '</p>' +
+          '<p class="phone">' + escapeHtml(a.phone) + ' · <span class="appt-source">' + escapeHtml(sourceLabel) + '</span></p>' +
         '</div>' +
         '<div class="appt-col">' +
           '<p class="label">Sucursal</p>' +
-          '<p class="value">' + escapeHtml(a.sucursalNombre || '—') + '</p>' +
+          '<p class="value">' + escapeHtml(a.sucursalNombre) + (a.fecha ? '<br>' + escapeHtml(a.fecha) : '') + '</p>' +
         '</div>' +
         '<div class="appt-col">' +
           '<p class="label">Servicio</p>' +
@@ -177,14 +220,33 @@ function renderAppointments() {
 
   list.querySelectorAll('.appt-card').forEach(function (card) {
     const id = card.getAttribute('data-id');
+    const isRemote = card.getAttribute('data-remote') === '1';
+
     card.querySelector('.appt-status').addEventListener('change', function (e) {
+      const newStatus = e.target.value;
+      if (isRemote) {
+        fetch(API_BASE + '/api/appointments/' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + ADMIN_TOKEN },
+          body: JSON.stringify({ status: newStatus })
+        }).catch(function () {});
+        return;
+      }
       const appt = state.appointments.find(function (a) { return a.id === id; });
       if (appt) {
-        appt.status = e.target.value;
+        appt.status = newStatus;
         saveAppointments(state.appointments);
       }
     });
+
     card.querySelector('.btn-delete').addEventListener('click', function () {
+      if (isRemote) {
+        fetch(API_BASE + '/api/appointments/' + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: { Authorization: 'Bearer ' + ADMIN_TOKEN }
+        }).finally(renderAppointments);
+        return;
+      }
       state.appointments = state.appointments.filter(function (a) { return a.id !== id; });
       saveAppointments(state.appointments);
       renderAppointments();

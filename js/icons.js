@@ -29,3 +29,8 @@ export function whatsappSVG(color, size) {
 export function quoteSVG(color) {
   return `<svg width="24" height="24" viewBox="0 0 24 24" style="margin-bottom:12px"><path d="M7 10c0-2.8 2.2-5 5-5v3c-1.1 0-2 .9-2 2h2v5H7v-5Zm9 0c0-2.8 2.2-5 5-5v3c-1.1 0-2 .9-2 2h2v5h-5v-5Z" fill="${color}"/></svg>`;
 }
+
+export function chatSVG(color, size) {
+  const s = size || 24;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4.5 3.5V16.5H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"></path></svg>`;
+}
