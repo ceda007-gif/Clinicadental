@@ -147,18 +147,35 @@ async function sendMessage(text) {
   }
 }
 
+function resizeInput(input) {
+  input.style.height = 'auto';
+  input.style.height = input.scrollHeight + 'px';
+}
+
 function init() {
   document.getElementById('chatToggleIcon').innerHTML = chatSVG('#ffffff', 24);
   document.getElementById('chatToggle').addEventListener('click', openChat);
   document.getElementById('chatClose').addEventListener('click', closeChat);
-  document.getElementById('chatInput').disabled = true;
+
+  const input = document.getElementById('chatInput');
+  input.disabled = true;
+
+  input.addEventListener('input', function () { resizeInput(input); });
+
+  // Enter sends the message; Shift+Enter inserts a new line, like WhatsApp.
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      document.getElementById('chatForm').requestSubmit();
+    }
+  });
 
   document.getElementById('chatForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    const input = document.getElementById('chatInput');
     const text = input.value.trim();
     if (!text) return;
     input.value = '';
+    resizeInput(input);
     sendMessage(text);
   });
 }
