@@ -153,6 +153,38 @@ function systemPrompt() {
   return prompt;
 }
 
+function sleep(ms) {
+  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+}
+
+function isQuotaError(err) {
+  return Boolean(err) && (err.status === 429 || /RESOURCE_EXHAUSTED/.test(String(err.message || '')));
+}
+
+function parseRetryDelaySeconds(err) {
+  const match = /"retryDelay":"(\d+(?:\.\d+)?)s"/.exec(String(err && err.message || ''));
+  return match ? Math.min(Number(match[1]), 15) : 5;
+}
+
+// The free Gemini tier allows very few requests per minute, and a single
+// conversation turn can make several (one per tool call). A transient 429
+// there is expected, not a bug — retry once or twice using the delay Google
+// itself suggests before giving up.
+async function generateWithRetry(client, params) {
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await client.models.generateContent(params);
+    } catch (err) {
+      if (isQuotaError(err) && attempt < maxAttempts) {
+        await sleep(parseRetryDelaySeconds(err) * 1000);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 export async function runChat(history, userMessage) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -165,44 +197,58 @@ export async function runChat(history, userMessage) {
   const client = new GoogleGenAI({ apiKey: apiKey });
   const contents = history.concat([{ role: 'user', parts: [{ text: userMessage }] }]);
 
-  for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
-    const response = await client.models.generateContent({
-      model: MODEL,
-      contents: contents,
-      config: {
-        systemInstruction: systemPrompt(),
-        tools: [{ functionDeclarations: TOOLS }]
+  try {
+    for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
+      const response = await generateWithRetry(client, {
+        model: MODEL,
+        contents: contents,
+        config: {
+          systemInstruction: systemPrompt(),
+          tools: [{ functionDeclarations: TOOLS }]
+        }
+      });
+
+      const candidateContent = response.candidates && response.candidates[0] && response.candidates[0].content;
+      const parts = (candidateContent && candidateContent.parts) || [];
+      contents.push({ role: 'model', parts: parts });
+
+      const functionCalls = response.functionCalls;
+      if (!functionCalls || !functionCalls.length) {
+        return {
+          reply: response.text || '',
+          history: contents
+        };
       }
-    });
 
-    const candidateContent = response.candidates && response.candidates[0] && response.candidates[0].content;
-    const parts = (candidateContent && candidateContent.parts) || [];
-    contents.push({ role: 'model', parts: parts });
-
-    const functionCalls = response.functionCalls;
-    if (!functionCalls || !functionCalls.length) {
+      const responseParts = functionCalls.map(function (call) {
+        let result;
+        try {
+          result = runTool(call.name, call.args || {});
+        } catch (err) {
+          result = { error: 'Error interno: ' + err.message };
+        }
+        return {
+          functionResponse: {
+            id: call.id,
+            name: call.name,
+            response: result
+          }
+        };
+      });
+      contents.push({ role: 'user', parts: responseParts });
+    }
+  } catch (err) {
+    console.error('chat error', err);
+    if (isQuotaError(err)) {
       return {
-        reply: response.text || '',
-        history: contents
+        reply: 'Ahora mismo tengo muchas solicitudes de golpe. Espera unos segundos e intenta de nuevo, o escríbenos por WhatsApp si es urgente.',
+        history: history
       };
     }
-
-    const responseParts = functionCalls.map(function (call) {
-      let result;
-      try {
-        result = runTool(call.name, call.args || {});
-      } catch (err) {
-        result = { error: 'Error interno: ' + err.message };
-      }
-      return {
-        functionResponse: {
-          id: call.id,
-          name: call.name,
-          response: result
-        }
-      };
-    });
-    contents.push({ role: 'user', parts: responseParts });
+    return {
+      reply: 'Tuve un problema para procesar tu mensaje. Intenta de nuevo en un momento, o escríbenos por WhatsApp.',
+      history: history
+    };
   }
 
   return {
