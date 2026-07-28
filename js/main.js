@@ -26,6 +26,12 @@ function renderHero() {
   document.getElementById('heroEyebrow').textContent = content.hero.eyebrow;
   document.getElementById('heroTitle').textContent = content.hero.title;
   document.getElementById('heroSubtitle').textContent = content.hero.subtitle;
+
+  const placeholder = document.getElementById('heroImagePlaceholder');
+  if (content.heroImage) {
+    placeholder.classList.add('has-photo');
+    placeholder.innerHTML = '<img src="' + content.heroImage + '" alt="' + escapeHtml(content.clinicName) + '">';
+  }
 }
 
 function renderServices() {
@@ -65,9 +71,12 @@ function renderWhyUs() {
 function renderTeam() {
   const grid = document.getElementById('teamGrid');
   grid.innerHTML = (content.team || []).map(function (item) {
+    const photo = item.photo
+      ? '<div class="team-photo has-photo"><img src="' + item.photo + '" alt="' + escapeHtml(item.name) + '"></div>'
+      : '<div class="team-photo"><span>foto placeholder</span></div>';
     return (
       '<div class="team-card">' +
-        '<div class="team-photo"><span>foto placeholder</span></div>' +
+        photo +
         '<h3>' + escapeHtml(item.name) + '</h3>' +
         '<p>' + escapeHtml(item.role) + '</p>' +
       '</div>'

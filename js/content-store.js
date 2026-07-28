@@ -16,6 +16,7 @@ export const DEFAULT_CONTENT = {
     title: 'Tu sonrisa está en las mejores manos',
     subtitle: 'Atención dental cercana y profesional para toda la familia. Tecnología moderna, doctores certificados y horarios que se adaptan a ti.'
   },
+  heroImage: null,
   services: [
     { id: 's1', shape: 'ring', title: 'Limpieza dental', desc: 'Profilaxis profesional para mantener tu boca sana y libre de placa.' },
     { id: 's2', shape: 'diamond', title: 'Ortodoncia', desc: 'Brackets tradicionales e invisibles para alinear tu sonrisa a tu ritmo.' },
@@ -30,9 +31,9 @@ export const DEFAULT_CONTENT = {
     { id: 'w3', shape: 'diamond', title: 'Ambiente cómodo', desc: 'Consultorios diseñados para que tu visita sea relajada.' }
   ],
   team: [
-    { id: 't1', name: 'Dra. Ana Martínez', role: 'Ortodoncista' },
-    { id: 't2', name: 'Dr. Luis Herrera', role: 'Implantólogo' },
-    { id: 't3', name: 'Dra. Sofía Ramírez', role: 'Odontopediatra' }
+    { id: 't1', name: 'Dra. Ana Martínez', role: 'Ortodoncista', photo: null },
+    { id: 't2', name: 'Dr. Luis Herrera', role: 'Implantólogo', photo: null },
+    { id: 't3', name: 'Dra. Sofía Ramírez', role: 'Odontopediatra', photo: null }
   ],
   testimonials: [
     { id: 'r1', quote: 'Perdí el miedo al dentista. El equipo explica cada paso y siempre me siento en buenas manos.', name: 'Mariana G.' },
@@ -85,4 +86,23 @@ export function waLink(phone, message) {
 
 export function newId(prefix) {
   return prefix + Date.now() + Math.floor(Math.random() * 1000);
+}
+
+export const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+
+export function readImageFile(file) {
+  return new Promise(function (resolve, reject) {
+    if (!file.type || file.type.indexOf('image/') !== 0) {
+      reject(new Error('Selecciona un archivo de imagen.'));
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      reject(new Error('La imagen pesa más de 2 MB. Usa una foto más ligera.'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function () { resolve(reader.result); };
+    reader.onerror = function () { reject(new Error('No se pudo leer la imagen.')); };
+    reader.readAsDataURL(file);
+  });
 }

@@ -1,5 +1,5 @@
 import {
-  loadContent, saveContent, loadAppointments, saveAppointments, newId
+  loadContent, saveContent, loadAppointments, saveAppointments, newId, readImageFile
 } from './content-store.js';
 import { checkLogoSVG } from './icons.js';
 
@@ -194,14 +194,48 @@ function renderHeroForm() {
   document.getElementById('heroEyebrowInput').value = state.draft.hero.eyebrow;
   document.getElementById('heroTitleInput').value = state.draft.hero.title;
   document.getElementById('heroSubtitleInput').value = state.draft.hero.subtitle;
+  renderHeroImagePreview();
+}
+
+function renderHeroImagePreview() {
+  const preview = document.getElementById('heroImagePreview');
+  const removeBtn = document.getElementById('removeHeroImageBtn');
+  if (state.draft.heroImage) {
+    preview.innerHTML = '<img src="' + state.draft.heroImage + '" alt="">';
+    removeBtn.classList.remove('hidden');
+  } else {
+    preview.innerHTML = '<span>Sin foto</span>';
+    removeBtn.classList.add('hidden');
+  }
 }
 
 function initHeroForm() {
   document.getElementById('heroEyebrowInput').addEventListener('input', function (e) { state.draft.hero.eyebrow = e.target.value; });
   document.getElementById('heroTitleInput').addEventListener('input', function (e) { state.draft.hero.title = e.target.value; });
   document.getElementById('heroSubtitleInput').addEventListener('input', function (e) { state.draft.hero.subtitle = e.target.value; });
+
+  const errorEl = document.getElementById('heroImageError');
+  document.getElementById('heroImageInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    readImageFile(file).then(function (dataUrl) {
+      errorEl.classList.add('hidden');
+      state.draft.heroImage = dataUrl;
+      renderHeroImagePreview();
+    }).catch(function (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    });
+  });
+  document.getElementById('removeHeroImageBtn').addEventListener('click', function () {
+    state.draft.heroImage = null;
+    renderHeroImagePreview();
+  });
+
   document.getElementById('saveHeroBtn').addEventListener('click', function () {
     state.content.hero = JSON.parse(JSON.stringify(state.draft.hero));
+    state.content.heroImage = state.draft.heroImage || null;
     saveContent(state.content);
     flashSaved('hero');
   });
@@ -249,8 +283,18 @@ function initServicesForm() {
 function renderTeamForm() {
   const list = document.getElementById('teamList');
   list.innerHTML = (state.draft.team || []).map(function (item, idx) {
+    const photoPreview = item.photo
+      ? '<img src="' + item.photo + '" alt="">'
+      : '<span>Sin foto</span>';
     return (
       '<div class="admin-card" data-idx="' + idx + '">' +
+        '<div class="photo-field">' +
+          '<div class="photo-preview">' + photoPreview + '</div>' +
+          '<div class="photo-field-actions">' +
+            '<label class="btn btn-admin btn-file">Subir<input type="file" class="team-photo-input" accept="image/*" hidden></label>' +
+            (item.photo ? '<button type="button" class="btn-text-remove team-photo-remove">Quitar</button>' : '') +
+          '</div>' +
+        '</div>' +
         '<input type="text" class="team-name" value="' + escapeAttr(item.name) + '" placeholder="Nombre" style="flex:1 1 200px;min-width:160px;font-weight:600">' +
         '<input type="text" class="team-role" value="' + escapeAttr(item.role) + '" placeholder="Especialidad" style="flex:1 1 200px;min-width:160px">' +
         '<button class="btn-delete">Eliminar</button>' +
@@ -266,12 +310,30 @@ function renderTeamForm() {
       state.draft.team.splice(idx, 1);
       renderTeamForm();
     });
+    card.querySelector('.team-photo-input').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      readImageFile(file).then(function (dataUrl) {
+        state.draft.team[idx].photo = dataUrl;
+        renderTeamForm();
+      }).catch(function (err) {
+        alert(err.message);
+      });
+    });
+    const removeBtn = card.querySelector('.team-photo-remove');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function () {
+        state.draft.team[idx].photo = null;
+        renderTeamForm();
+      });
+    }
   });
 }
 
 function initTeamForm() {
   document.getElementById('addTeamBtn').addEventListener('click', function () {
-    state.draft.team.push({ id: newId('t'), name: 'Nuevo doctor(a)', role: 'Especialidad' });
+    state.draft.team.push({ id: newId('t'), name: 'Nuevo doctor(a)', role: 'Especialidad', photo: null });
     renderTeamForm();
   });
   document.getElementById('saveTeamBtn').addEventListener('click', function () {

@@ -69,6 +69,19 @@
           <label>Subtítulo
             <textarea id="heroSubtitleInput" rows="3"></textarea>
           </label>
+          <label>Foto del hero (consultorio / equipo)
+            <div class="photo-field">
+              <div class="photo-preview" id="heroImagePreview"><span>Sin foto</span></div>
+              <div class="photo-field-actions">
+                <label class="btn btn-admin btn-file">
+                  Subir foto
+                  <input type="file" id="heroImageInput" accept="image/*" hidden>
+                </label>
+                <button type="button" class="btn-text-remove hidden" id="removeHeroImageBtn">Quitar foto</button>
+              </div>
+            </div>
+          </label>
+          <p class="field-error hidden" id="heroImageError"></p>
           <div>
             <button class="btn btn-admin admin-save" id="saveHeroBtn">Guardar cambios</button>
             <span class="saved-flag hidden" id="savedHero">Guardado ✓</span>

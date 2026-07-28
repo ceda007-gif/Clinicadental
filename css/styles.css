@@ -123,6 +123,8 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; margin: 0
   font-family: ui-monospace, monospace; font-size: 13px; color: var(--accent-hover);
   background: #ffffff; padding: 8px 14px; border-radius: 8px;
 }
+.image-placeholder.has-photo { background: none; box-shadow: var(--shadow-lg); }
+.image-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; }
 
 /* Sections */
 .section { padding: 88px 40px; }
@@ -175,6 +177,8 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; margin: 0
   font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--accent-hover);
   background: #ffffff; padding: 6px 10px; border-radius: 6px;
 }
+.team-photo.has-photo { background: none; }
+.team-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
 .team-card h3 { font-size: 17px; margin: 0 0 4px; }
 .team-card p { font-size: 14px; color: var(--accent-hover); font-weight: 500; margin: 0; }
 
@@ -313,6 +317,24 @@ body.admin { background: var(--section-bg); }
 .admin-card textarea { resize: vertical; font-family: inherit; }
 .admin-card .btn-delete { flex: none; background: none; border: none; color: var(--error); font-size: 13px; cursor: pointer; padding: 6px 10px; }
 .admin-empty { background: #ffffff; border-radius: 16px; padding: 40px; text-align: center; color: var(--muted-1); font-size: 14.5px; }
+
+/* Photo upload */
+.photo-field { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.photo-preview {
+  width: 84px; height: 84px; flex: none; border-radius: 14px; overflow: hidden;
+  background: var(--section-bg); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-preview span { font-size: 11px; color: var(--muted-1); text-align: center; padding: 0 6px; }
+.photo-field-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.btn-file { font-size: 13px; padding: 9px 16px; cursor: pointer; }
+.btn-text-remove { background: none; border: none; color: var(--error); font-size: 12.5px; cursor: pointer; padding: 0; text-align: left; }
+
+.admin-card .photo-preview { width: 56px; height: 56px; border-radius: 10px; }
+.admin-card .photo-field { margin-top: 0; gap: 10px; }
+.admin-card .photo-field-actions { flex-direction: row; align-items: center; gap: 10px; }
+.admin-card .btn-file { font-size: 12px; padding: 7px 12px; }
 
 .appt-card .appt-main { flex: 1 1 220px; min-width: 180px; }
 .appt-card .appt-main p.name { font-weight: 600; font-size: 15.5px; margin: 0 0 4px; }
