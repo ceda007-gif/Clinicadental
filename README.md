@@ -67,9 +67,12 @@ El backend vive en `server/` y hace tres cosas:
 
 El nivel gratuito de Gemini limita las solicitudes por minuto **por modelo**. Si el modelo
 preferido se satura (o deja de estar disponible), el bot salta automáticamente al
-siguiente de la lista (`gemini-2.5-flash` → `gemini-2.0-flash` → `gemini-2.0-flash-lite`,
-configurable con `GEMINI_MODEL` en `server/.env`) en vez de esperar — cada modelo tiene su
-propia cuota independiente.
+siguiente de la lista (`gemini-2.5-flash` → `gemini-2.0-flash`, configurable con
+`GEMINI_MODEL` en `server/.env`) en vez de esperar — cada modelo tiene su propia cuota
+independiente. (`gemini-2.0-flash-lite` no está en la lista: el nivel gratuito de este
+proyecto tiene cuota 0 para ese modelo específico, así que nunca ayudaría como respaldo.)
+Si haces muchas pruebas seguidas en poco tiempo, es normal toparte con este límite
+ocasionalmente — se recupera solo en menos de un minuto.
 
 Para que el chat converse de verdad (y no solo el resto del sitio), copia
 `server/.env.example` a `server/.env` y agrega tu `GEMINI_API_KEY` (se obtiene gratis en
