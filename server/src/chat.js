@@ -5,8 +5,11 @@ import { getFreeSlots, isSlotFree, AvailabilityError } from './availability.js';
 // Free-tier rate limits (and model availability) are tracked per model, so
 // when one is saturated or unavailable, jumping to the next gives it its own
 // separate quota instead of waiting out the same one. Order = preference.
+// gemini-flash-latest goes first — it's the one confirmed working live;
+// the pinned versions behind it are extra fallback quota, not replacements.
 const MODELS = Array.from(new Set([
   process.env.GEMINI_MODEL,
+  'gemini-flash-latest',
   'gemini-2.5-flash',
   'gemini-2.0-flash',
   'gemini-2.0-flash-lite'
