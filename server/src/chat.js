@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { getBranches, getServices, addAppointment, getClinicName, getAssistantInstructions } from './db.js';
 import { getFreeSlots, isSlotFree, AvailabilityError } from './availability.js';
 
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 const MAX_TOOL_ITERATIONS = 6;
 
 function newAppointmentId() {
