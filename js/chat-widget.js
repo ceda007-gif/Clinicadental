@@ -14,6 +14,21 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// Renders the subset of WhatsApp-style formatting the assistant tends to use:
+// **bold** / *bold* → <strong>, _italic_ → <em>. Runs on already-escaped text,
+// so the markers themselves can't inject HTML.
+function formatMessage(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(?:^|\s)\*(\S(?:[^*]*?\S)?)\*(?=[\s.,;:!?)]|$)/g, function (match, inner) {
+      return match.replace('*' + inner + '*', '<strong>' + inner + '</strong>');
+    })
+    .replace(/(?:^|\s)_(\S(?:[^_]*?\S)?)_(?=[\s.,;:!?)]|$)/g, function (match, inner) {
+      return match.replace('_' + inner + '_', '<em>' + inner + '</em>');
+    })
+    .replace(/\n/g, '<br>');
+}
+
 function firstBranchWaLink() {
   const branch = (content.branches || [])[0];
   if (!branch) return null;
@@ -24,7 +39,7 @@ function appendMessage(role, text) {
   const messages = document.getElementById('chatMessages');
   const el = document.createElement('div');
   el.className = 'chat-msg chat-msg-' + role;
-  el.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+  el.innerHTML = formatMessage(text);
   messages.appendChild(el);
   messages.scrollTop = messages.scrollHeight;
   return el;
