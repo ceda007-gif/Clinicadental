@@ -1,9 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import pg from 'pg';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', 'data', 'db.json');
+
+// If DATABASE_URL is set (Supabase/Postgres) content survives redeploys —
+// Render's free tier has no persistent disk, so a plain file on it gets
+// reset to the seed data on every deploy. Without DATABASE_URL (local dev)
+// we fall back to the JSON file so `npm start` still works with no setup.
+const DATABASE_URL = process.env.DATABASE_URL;
+const pool = DATABASE_URL ? new pg.Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } }) : null;
+let pgReady = null;
 
 const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches', 'assistantInstructions', 'gallery'];
 
@@ -86,43 +95,63 @@ const SEED = {
   appointments: []
 };
 
-function ensureDb() {
+function ensureFileDb() {
   if (!fs.existsSync(DB_PATH)) {
     fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
     fs.writeFileSync(DB_PATH, JSON.stringify(SEED, null, 2));
   }
 }
 
-function readDb() {
-  ensureDb();
+async function ensurePgTable() {
+  if (!pgReady) {
+    pgReady = pool.query('CREATE TABLE IF NOT EXISTS app_state (id SMALLINT PRIMARY KEY, data JSONB NOT NULL)')
+      .then(function () {
+        return pool.query('INSERT INTO app_state (id, data) VALUES (1, $1) ON CONFLICT (id) DO NOTHING', [SEED]);
+      });
+  }
+  await pgReady;
+}
+
+async function readDb() {
+  if (pool) {
+    await ensurePgTable();
+    const result = await pool.query('SELECT data FROM app_state WHERE id = 1');
+    return result.rows[0].data;
+  }
+  ensureFileDb();
   return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
 }
 
-function writeDb(data) {
+async function writeDb(data) {
+  if (pool) {
+    await pool.query('UPDATE app_state SET data = $1 WHERE id = 1', [data]);
+    return;
+  }
   const tmpPath = DB_PATH + '.tmp';
   fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2));
   fs.renameSync(tmpPath, DB_PATH);
 }
 
-export function getBranches() {
-  return readDb().branches;
+export async function getBranches() {
+  return (await readDb()).branches;
 }
 
-export function getBranch(id) {
-  return readDb().branches.find(function (b) { return b.id === id; }) || null;
+export async function getBranch(id) {
+  const db = await readDb();
+  return db.branches.find(function (b) { return b.id === id; }) || null;
 }
 
-export function getServices() {
-  return readDb().services;
+export async function getServices() {
+  return (await readDb()).services;
 }
 
-export function getService(idOrTitle) {
-  const services = readDb().services;
+export async function getService(idOrTitle) {
+  const services = (await readDb()).services;
   return services.find(function (s) { return s.id === idOrTitle || s.title === idOrTitle; }) || null;
 }
 
-export function getAppointments(filter) {
-  const list = readDb().appointments;
+export async function getAppointments(filter) {
+  const list = (await readDb()).appointments;
   if (!filter) return list;
   return list.filter(function (a) {
     if (filter.branchId && a.branchId !== filter.branchId) return false;
@@ -131,54 +160,52 @@ export function getAppointments(filter) {
   });
 }
 
-export function addAppointment(appt) {
-  const db = readDb();
+export async function addAppointment(appt) {
+  const db = await readDb();
   db.appointments.unshift(appt);
-  writeDb(db);
+  await writeDb(db);
   return appt;
 }
 
-export function updateAppointment(id, patch) {
-  const db = readDb();
+export async function updateAppointment(id, patch) {
+  const db = await readDb();
   const idx = db.appointments.findIndex(function (a) { return a.id === id; });
   if (idx === -1) return null;
   db.appointments[idx] = Object.assign({}, db.appointments[idx], patch);
-  writeDb(db);
+  await writeDb(db);
   return db.appointments[idx];
 }
 
-export function deleteAppointment(id) {
-  const db = readDb();
+export async function deleteAppointment(id) {
+  const db = await readDb();
   const next = db.appointments.filter(function (a) { return a.id !== id; });
   const removed = next.length !== db.appointments.length;
   db.appointments = next;
-  writeDb(db);
+  await writeDb(db);
   return removed;
 }
 
-export function getClinicName() {
-  return readDb().clinicName;
+export async function getClinicName() {
+  return (await readDb()).clinicName;
 }
 
-export function getClinicContent() {
-  const db = readDb();
-  const content = {};
-  CONTENT_KEYS.forEach(function (key) { content[key] = db[key]; });
-  return content;
+export async function getClinicContent() {
+  const db = await readDb();
+  return getClinicContentFrom(db);
 }
 
-export function getAssistantInstructions() {
-  return readDb().assistantInstructions || '';
+export async function getAssistantInstructions() {
+  return (await readDb()).assistantInstructions || '';
 }
 
-export function updateClinicContent(patch) {
-  const db = readDb();
+export async function updateClinicContent(patch) {
+  const db = await readDb();
   CONTENT_KEYS.forEach(function (key) {
     if (Object.prototype.hasOwnProperty.call(patch, key)) {
       db[key] = patch[key];
     }
   });
-  writeDb(db);
+  await writeDb(db);
   return getClinicContentFrom(db);
 }
 

@@ -83,7 +83,9 @@ Sin ella, el sitio y el panel funcionan igual, pero el chat responde con un avis
 
 El backend es un servidor Node normal (Express) — se puede desplegar en Render, Railway,
 Fly.io, etc. Variables de entorno necesarias: `GEMINI_API_KEY` (obligatoria para que el
-chat funcione) y `ADMIN_TOKEN` (protege los endpoints de citas del panel de administración).
+chat funcione), `ADMIN_TOKEN` (protege los endpoints de citas del panel de administración)
+y `DATABASE_URL` (ver siguiente sección — sin ella el contenido no sobrevive a los
+despliegues en plataformas sin disco persistente como el free tier de Render).
 
 Si el sitio estático sigue en GitHub Pages y el backend en otro dominio, hay que apuntar el
 frontend al backend editando, en `index.html` y `admin.html`, la línea:
@@ -126,8 +128,16 @@ página — si cambias el horario real de una sucursal, actualiza ambos.
 
 ## Almacenamiento
 
-Todo vive en el backend, en `server/data/db.json` (se genera solo, a partir de datos de
-ejemplo, la primera vez que corres el servidor):
+Todo vive en el backend. Si configuras `DATABASE_URL` (recomendado en producción — por
+ejemplo con un proyecto gratuito de [Supabase](https://supabase.com)), el contenido y las
+citas se guardan en una tabla de Postgres (`app_state`, se crea sola en el primer arranque)
+y sobreviven a los despliegues. **Sin `DATABASE_URL`** se usa en su lugar el archivo
+`server/data/db.json` (se genera solo, a partir de datos de ejemplo, la primera vez que
+corres el servidor) — funciona bien para desarrollo local, pero en plataformas sin disco
+persistente (como el free tier de Render) ese archivo se reinicia con los datos de ejemplo
+cada vez que se despliega código nuevo, y **se pierden las ediciones hechas desde el panel**
+(fotos, sucursales, textos, etc.) hasta la siguiente edición. Por eso en producción conviene
+siempre tener `DATABASE_URL` configurada.
 
 - **Contenido del sitio** (hero, sucursales, servicios, equipo, testimonios): se lee con
   `GET /api/clinic` y se edita con `PATCH /api/clinic` (protegido con `ADMIN_TOKEN`) desde

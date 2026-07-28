@@ -79,35 +79,35 @@ function serviceSummary(s) {
   return { id: s.id, title: s.title, desc: s.desc, durationMinutes: s.durationMinutes };
 }
 
-function resolveServiceDuration(serviceName) {
-  const services = getServices();
+async function resolveServiceDuration(serviceName) {
+  const services = await getServices();
   const match = services.find(function (s) {
     return s.title.toLowerCase() === String(serviceName || '').toLowerCase() || s.id === serviceName;
   });
   return match ? match.durationMinutes : 30;
 }
 
-function runTool(name, input) {
+async function runTool(name, input) {
   if (name === 'list_branches') {
-    return { branches: getBranches().map(branchSummary) };
+    return { branches: (await getBranches()).map(branchSummary) };
   }
   if (name === 'list_services') {
-    return { services: getServices().map(serviceSummary) };
+    return { services: (await getServices()).map(serviceSummary) };
   }
   if (name === 'check_availability') {
     try {
-      const duration = resolveServiceDuration(input.service);
-      return getFreeSlots(input.branchId, input.date, duration);
+      const duration = await resolveServiceDuration(input.service);
+      return await getFreeSlots(input.branchId, input.date, duration);
     } catch (err) {
       if (err instanceof AvailabilityError) return { error: err.message };
       throw err;
     }
   }
   if (name === 'book_appointment') {
-    const duration = resolveServiceDuration(input.service);
+    const duration = await resolveServiceDuration(input.service);
     let free;
     try {
-      free = isSlotFree(input.branchId, input.date, input.time, duration);
+      free = await isSlotFree(input.branchId, input.date, input.time, duration);
     } catch (err) {
       if (err instanceof AvailabilityError) return { error: err.message };
       throw err;
@@ -130,16 +130,16 @@ function runTool(name, input) {
       source: 'chat',
       createdAt: new Date().toISOString()
     };
-    addAppointment(appt);
+    await addAppointment(appt);
     return { confirmed: true, appointment: appt };
   }
   return { error: 'Herramienta desconocida: ' + name };
 }
 
-function systemPrompt() {
-  const clinicName = getClinicName();
+async function systemPrompt() {
+  const clinicName = await getClinicName();
   const today = new Date().toISOString().slice(0, 10);
-  const customInstructions = getAssistantInstructions();
+  const customInstructions = await getAssistantInstructions();
 
   let prompt = (
     'Eres el asistente de agendado de citas de "' + clinicName + '", una clínica dental con varias sucursales. ' +
@@ -203,13 +203,14 @@ export async function runChat(history, userMessage) {
 
   const client = new GoogleGenAI({ apiKey: apiKey });
   const contents = history.concat([{ role: 'user', parts: [{ text: userMessage }] }]);
+  const instructions = await systemPrompt();
 
   try {
     for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
       const response = await generateWithFallback(client, {
         contents: contents,
         config: {
-          systemInstruction: systemPrompt(),
+          systemInstruction: instructions,
           tools: [{ functionDeclarations: TOOLS }]
         }
       });
@@ -226,10 +227,10 @@ export async function runChat(history, userMessage) {
         };
       }
 
-      const responseParts = functionCalls.map(function (call) {
+      const responseParts = await Promise.all(functionCalls.map(async function (call) {
         let result;
         try {
-          result = runTool(call.name, call.args || {});
+          result = await runTool(call.name, call.args || {});
         } catch (err) {
           result = { error: 'Error interno: ' + err.message };
         }
@@ -240,7 +241,7 @@ export async function runChat(history, userMessage) {
             response: result
           }
         };
-      });
+      }));
       contents.push({ role: 'user', parts: responseParts });
     }
   } catch (err) {

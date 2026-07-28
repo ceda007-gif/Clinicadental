@@ -32,16 +32,16 @@ app.get('/api/health', function (req, res) {
   res.json({ ok: true, aiEnabled: Boolean(process.env.GEMINI_API_KEY) });
 });
 
-app.get('/api/clinic', function (req, res) {
-  res.json(getClinicContent());
+app.get('/api/clinic', async function (req, res) {
+  res.json(await getClinicContent());
 });
 
-app.patch('/api/clinic', requireAdmin, function (req, res) {
-  const updated = updateClinicContent(req.body || {});
+app.patch('/api/clinic', requireAdmin, async function (req, res) {
+  const updated = await updateClinicContent(req.body || {});
   res.json(updated);
 });
 
-app.get('/api/availability', function (req, res) {
+app.get('/api/availability', async function (req, res) {
   const branchId = req.query.branchId;
   const date = req.query.date;
   const durationMinutes = req.query.durationMinutes;
@@ -50,7 +50,7 @@ app.get('/api/availability', function (req, res) {
     return;
   }
   try {
-    res.json(getFreeSlots(String(branchId), String(date), durationMinutes ? Number(durationMinutes) : undefined));
+    res.json(await getFreeSlots(String(branchId), String(date), durationMinutes ? Number(durationMinutes) : undefined));
   } catch (err) {
     if (err instanceof AvailabilityError) {
       res.status(400).json({ error: err.message });
@@ -77,11 +77,11 @@ app.post('/api/chat', async function (req, res) {
   }
 });
 
-app.get('/api/appointments', requireAdmin, function (req, res) {
-  res.json(getAppointments());
+app.get('/api/appointments', requireAdmin, async function (req, res) {
+  res.json(await getAppointments());
 });
 
-app.post('/api/appointments', function (req, res) {
+app.post('/api/appointments', async function (req, res) {
   const b = req.body || {};
   if (!b.branchId || !b.nombre || !b.telefono) {
     res.status(400).json({ error: 'Faltan datos requeridos (branchId, nombre, telefono).' });
@@ -93,12 +93,12 @@ app.post('/api/appointments', function (req, res) {
     source: b.source || 'form',
     createdAt: new Date().toISOString()
   });
-  addAppointment(appt);
+  await addAppointment(appt);
   res.status(201).json(appt);
 });
 
-app.patch('/api/appointments/:id', requireAdmin, function (req, res) {
-  const updated = updateAppointment(req.params.id, req.body || {});
+app.patch('/api/appointments/:id', requireAdmin, async function (req, res) {
+  const updated = await updateAppointment(req.params.id, req.body || {});
   if (!updated) {
     res.status(404).json({ error: 'Cita no encontrada.' });
     return;
@@ -106,8 +106,8 @@ app.patch('/api/appointments/:id', requireAdmin, function (req, res) {
   res.json(updated);
 });
 
-app.delete('/api/appointments/:id', requireAdmin, function (req, res) {
-  const removed = deleteAppointment(req.params.id);
+app.delete('/api/appointments/:id', requireAdmin, async function (req, res) {
+  const removed = await deleteAppointment(req.params.id);
   if (!removed) {
     res.status(404).json({ error: 'Cita no encontrada.' });
     return;

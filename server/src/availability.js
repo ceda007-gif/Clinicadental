@@ -20,11 +20,11 @@ function isValidDate(dateStr) {
 
 export class AvailabilityError extends Error {}
 
-export function getFreeSlots(branchId, dateStr, durationMinutes) {
+export async function getFreeSlots(branchId, dateStr, durationMinutes) {
   if (!isValidDate(dateStr)) {
     throw new AvailabilityError('Fecha inválida, usa formato AAAA-MM-DD.');
   }
-  const branch = getBranch(branchId);
+  const branch = await getBranch(branchId);
   if (!branch) {
     throw new AvailabilityError('Sucursal no encontrada.');
   }
@@ -40,7 +40,8 @@ export function getFreeSlots(branchId, dateStr, durationMinutes) {
   const closeMin = toMinutes(hours.close);
   const step = branch.slotMinutes || 30;
 
-  const existing = getAppointments({ branchId: branch.id, date: dateStr })
+  const existingAppointments = await getAppointments({ branchId: branch.id, date: dateStr });
+  const existing = existingAppointments
     .filter(function (a) { return a.status !== 'cancelado'; })
     .map(function (a) {
       const start = toMinutes(a.time);
@@ -62,7 +63,7 @@ export function getFreeSlots(branchId, dateStr, durationMinutes) {
   return { branch: branch.name, date: dateStr, open: true, slots: slots };
 }
 
-export function isSlotFree(branchId, dateStr, timeStr, durationMinutes) {
-  const result = getFreeSlots(branchId, dateStr, durationMinutes);
+export async function isSlotFree(branchId, dateStr, timeStr, durationMinutes) {
+  const result = await getFreeSlots(branchId, dateStr, durationMinutes);
   return result.open && result.slots.indexOf(timeStr) !== -1;
 }
