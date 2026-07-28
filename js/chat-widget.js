@@ -60,6 +60,24 @@ function removeTyping() {
   if (el) el.remove();
 }
 
+// Keeps the "typing…" indicator up for roughly how long a person would take
+// to type the reply (a bit faster than average, so it stays natural without
+// feeling slow), but never adds extra wait on top of a response that was
+// already slow for other reasons (e.g. a rate-limit retry).
+const TYPING_MS_PER_CHAR = 18;
+const TYPING_MIN_MS = 600;
+const TYPING_MAX_MS = 3500;
+
+function wait(ms) {
+  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+}
+
+function waitForTypingEffect(text, sinceTimestamp) {
+  const target = Math.min(TYPING_MAX_MS, Math.max(TYPING_MIN_MS, String(text || '').length * TYPING_MS_PER_CHAR));
+  const remaining = target - (Date.now() - sinceTimestamp);
+  return remaining > 0 ? wait(remaining) : Promise.resolve();
+}
+
 async function checkBackend() {
   if (backendAvailable !== null) return backendAvailable;
   try {
@@ -102,6 +120,7 @@ async function sendMessage(text) {
   sending = true;
   appendMessage('user', text);
   appendTyping();
+  const startedAt = Date.now();
 
   try {
     const res = await fetch(API_BASE + '/api/chat', {
@@ -110,12 +129,15 @@ async function sendMessage(text) {
       body: JSON.stringify({ message: text, history: history })
     });
     const data = await res.json();
-    removeTyping();
     if (!res.ok) {
+      removeTyping();
       appendMessage('assistant', data.error || 'Ocurrió un error, intenta de nuevo.');
     } else {
       history = data.history || history;
-      appendMessage('assistant', data.reply || '...');
+      const reply = data.reply || '...';
+      await waitForTypingEffect(reply, startedAt);
+      removeTyping();
+      appendMessage('assistant', reply);
     }
   } catch (e) {
     removeTyping();
