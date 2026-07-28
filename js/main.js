@@ -1,7 +1,7 @@
-import { loadContent, addAppointment, waLink, newId } from './content-store.js';
+import { loadContent, submitAppointment, waLink, newId } from './content-store.js';
 import { shapeIconSVG, checkLogoSVG, whatsappSVG } from './icons.js';
 
-const content = loadContent();
+const content = await loadContent();
 
 function branches() {
   return content.branches || [];
@@ -169,7 +169,7 @@ function setupContactForm() {
   const errorTelefono = document.getElementById('errorTelefono');
   const successMsg = document.getElementById('formSuccess');
 
-  form.addEventListener('submit', function (e) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     const sucursalId = sucursalSelect.value;
@@ -214,9 +214,9 @@ function setupContactForm() {
     if (servicio) lines.push('Servicio de interés: ' + servicio);
     if (mensaje.trim()) lines.push('Mensaje: ' + mensaje.trim());
 
-    addAppointment({
+    await submitAppointment({
       id: newId('a'),
-      sucursalId: branch.id,
+      branchId: branch.id,
       sucursalNombre: branch.name,
       nombre: nombre,
       telefono: telefono,

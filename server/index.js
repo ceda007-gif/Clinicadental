@@ -3,8 +3,9 @@ import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  getBranches, getServices, getAppointments, addAppointment,
-  updateAppointment, deleteAppointment, getClinicName
+  getAppointments, addAppointment,
+  updateAppointment, deleteAppointment,
+  getClinicContent, updateClinicContent
 } from './src/db.js';
 import { getFreeSlots, AvailabilityError } from './src/availability.js';
 import { runChat } from './src/chat.js';
@@ -15,7 +16,7 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'dev-admin-token';
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '15mb' }));
 
 function requireAdmin(req, res, next) {
   const auth = req.get('authorization') || '';
@@ -32,11 +33,12 @@ app.get('/api/health', function (req, res) {
 });
 
 app.get('/api/clinic', function (req, res) {
-  res.json({
-    clinicName: getClinicName(),
-    branches: getBranches(),
-    services: getServices()
-  });
+  res.json(getClinicContent());
+});
+
+app.patch('/api/clinic', requireAdmin, function (req, res) {
+  const updated = updateClinicContent(req.body || {});
+  res.json(updated);
 });
 
 app.get('/api/availability', function (req, res) {

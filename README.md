@@ -18,30 +18,38 @@ disponibilidad y agenda la cita — usando la API de Claude, vía un backend en 
 index.html          Landing pública (incluye el widget de chat)
 admin.html           Panel de administración
 css/styles.css        Estilos y tokens de diseño compartidos
-js/content-store.js   Contenido y citas del formulario (persistidos en localStorage)
+js/content-store.js   Cliente de la API de contenido/citas (con respaldo local si el backend no responde)
 js/config.js           URL del backend / token de admin para llamadas a la API
 js/icons.js            Iconos SVG inline reutilizables
 js/main.js             Lógica de la landing (render + formulario de contacto)
 js/admin.js             Lógica del panel de administración (incluye citas del bot)
 js/chat-widget.js       Widget de chat que habla con el backend
 
-server/                Backend Node/Express: calendario de disponibilidad, citas
-                        compartidas y el agente de IA (server/src/chat.js)
+server/                Backend Node/Express: contenido del sitio, calendario de
+                        disponibilidad, citas compartidas y el agente de IA
+                        (server/src/chat.js)
 ```
 
 ## Cómo correrlo
 
-Ambas páginas usan ES modules (`import`/`export`), por lo que deben servirse por HTTP
-(no funcionan abriendo el `.html` directamente con `file://`). Por ejemplo:
+El contenido del sitio (hero, sucursales, servicios, equipo, testimonios) y las citas
+viven en el backend (`server/`), para que sean los mismos en cualquier dispositivo —
+computadora, celular, el navegador de un paciente, etc. Para tener el sitio completo
+(landing + admin + backend) corriendo en un solo lugar:
 
 ```bash
-npx serve .
-# o
-python3 -m http.server 8080
+cd server
+npm install
+npm start   # sirve la API en :3001 y también index.html / admin.html
 ```
 
-Luego abre `http://localhost:8080/` para la landing y `http://localhost:8080/admin.html`
-para el panel de administración.
+Abre `http://localhost:3001/`.
+
+También puedes abrir `index.html`/`admin.html` sueltos con un servidor estático
+(`npx serve .`, `python3 -m http.server 8080`) — funcionan sin backend, pero **en modo
+solo lectura con los datos de ejemplo**: sin backend, cualquier edición desde el panel de
+administración falla (no hay dónde guardarla) y todos los visitantes ven siempre el mismo
+contenido de ejemplo, sin importar lo que se haya intentado editar antes.
 
 ## Asistente de citas con IA
 
@@ -57,17 +65,9 @@ El backend vive en `server/` y hace tres cosas:
    — el panel de administración (sección **Citas**) las combina con las del formulario y
    marca cada una como "Asistente IA" o "Formulario".
 
-### Correrlo en local
-
-```bash
-cd server
-npm install
-cp .env.example .env   # agrega tu ANTHROPIC_API_KEY
-npm start              # sirve la API en :3001 y también el sitio estático
-```
-
-Abre `http://localhost:3001/` — el chat y el sitio funcionan desde el mismo servidor.
-Sin `ANTHROPIC_API_KEY`, el resto del sitio funciona igual, pero el chat responde con un
+Para que el chat converse de verdad (y no solo el resto del sitio), copia
+`server/.env.example` a `server/.env` y agrega tu `ANTHROPIC_API_KEY` antes de
+`npm start`. Sin ella, el sitio y el panel funcionan igual, pero el chat responde con un
 aviso de "asistente no activado todavía" en vez de conversar.
 
 ### Desplegarlo
@@ -99,27 +99,38 @@ producción, reemplaza ambas por un login real.
 
 ## Datos de ejemplo pendientes de reemplazar
 
-Antes de publicar, actualiza (vía el panel de administración, sección **Sucursales**, o
-`js/content-store.js`):
+Antes de publicar, actualiza **desde el panel de administración** (con el backend
+desplegado y accesible):
 
-- Nombre, dirección, horarios, correo y número de WhatsApp de cada sucursal
-- Teléfono y dirección del JSON-LD y meta tags en `index.html`
+- Nombre, dirección, horarios, correo y número de WhatsApp de cada sucursal (sección
+  **Sucursales**)
+- Teléfono y dirección del JSON-LD y meta tags en `index.html` (esto es estático, se edita
+  a mano en el archivo)
 - Fotografías (actualmente hay placeholders con patrón de rayas)
 
 Se puede agregar o quitar sucursales desde el mismo panel ("+ Agregar sucursal" / "Eliminar").
 Servicios, equipo y testimonios son compartidos por ambas sucursales; si necesitas que
-varíen por sucursal, hay que extender el modelo de datos.
+varíen por sucursal, hay que extender el modelo de datos. El horario que usa el calendario
+de disponibilidad del asistente de IA (`schedule` en `server/src/db.js`, horas exactas por
+día) es un dato aparte de los textos `hoursWeekday`/`hoursSaturday` que se muestran en la
+página — si cambias el horario real de una sucursal, actualiza ambos.
 
 ## Almacenamiento
 
-- **Contenido del sitio** (hero, servicios, equipo, testimonios, sucursales): objeto único
-  persistido en `localStorage` (`dentalClinicContent`), editable desde el panel de
-  administración. Nota: los datos de sucursales aquí (horarios, teléfonos) son independientes
-  de los que usa el backend para calcular disponibilidad (`server/src/db.js`) — hoy hay que
-  mantenerlos sincronizados a mano si cambian.
-- **Citas del formulario de contacto**: lista en `localStorage` (`dentalClinicAppointments`).
-- **Citas del asistente de IA y calendario de disponibilidad**: en `server/data/db.json`
-  (backend), compartido entre todas las visitas — no depende del navegador de cada quien.
+Todo vive en el backend, en `server/data/db.json` (se genera solo, a partir de datos de
+ejemplo, la primera vez que corres el servidor):
 
-En producción, lo ideal es mover también el contenido del sitio (hoy en `localStorage`) al
-backend, para tener una sola fuente de verdad.
+- **Contenido del sitio** (hero, sucursales, servicios, equipo, testimonios): se lee con
+  `GET /api/clinic` y se edita con `PATCH /api/clinic` (protegido con `ADMIN_TOKEN`) desde
+  el panel de administración.
+- **Citas** (del formulario o del asistente de IA): `GET/POST /api/appointments`,
+  `PATCH/DELETE /api/appointments/:id`.
+- **Calendario de disponibilidad**: calculado a partir del horario (`schedule`) de cada
+  sucursal y las citas ya guardadas.
+
+El navegador solo guarda una copia en caché (`localStorage`) por si el backend está
+temporalmente inaccesible, para que el sitio no se caiga. Pero la fuente de verdad — y lo
+que ve cualquier visitante, en cualquier dispositivo — es siempre el backend. Sin backend
+desplegado y accesible, las ediciones desde el panel de administración fallan con un aviso
+(no se pierden en silencio), y el sitio público muestra la última copia en caché de ese
+navegador o, si nunca hubo una, los datos de ejemplo.

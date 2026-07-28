@@ -2,7 +2,7 @@ import { API_BASE } from './config.js';
 import { loadContent, waLink } from './content-store.js';
 import { chatSVG } from './icons.js';
 
-const content = loadContent();
+const content = await loadContent();
 
 let history = [];
 let sending = false;

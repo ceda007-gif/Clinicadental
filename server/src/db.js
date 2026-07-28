@@ -5,8 +5,31 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', 'data', 'db.json');
 
+const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches'];
+
 const SEED = {
   clinicName: 'Clínica Dental Sonrisa',
+  hero: {
+    eyebrow: 'Cuidado dental de confianza',
+    title: 'Tu sonrisa está en las mejores manos',
+    subtitle: 'Atención dental cercana y profesional para toda la familia. Tecnología moderna, doctores certificados y horarios que se adaptan a ti.'
+  },
+  heroImage: null,
+  whyUs: [
+    { id: 'w1', shape: 'circle', title: 'Tecnología moderna', desc: 'Equipos digitales de diagnóstico para tratamientos más precisos.' },
+    { id: 'w2', shape: 'cross', title: 'Doctores certificados', desc: 'Especialistas con años de experiencia y formación continua.' },
+    { id: 'w3', shape: 'diamond', title: 'Ambiente cómodo', desc: 'Consultorios diseñados para que tu visita sea relajada.' }
+  ],
+  team: [
+    { id: 't1', name: 'Dra. Ana Martínez', role: 'Ortodoncista', photo: null },
+    { id: 't2', name: 'Dr. Luis Herrera', role: 'Implantólogo', photo: null },
+    { id: 't3', name: 'Dra. Sofía Ramírez', role: 'Odontopediatra', photo: null }
+  ],
+  testimonials: [
+    { id: 'r1', quote: 'Perdí el miedo al dentista. El equipo explica cada paso y siempre me siento en buenas manos.', name: 'Mariana G.' },
+    { id: 'r2', quote: 'Agendar mi cita por WhatsApp fue súper rápido y me atendieron puntual.', name: 'Roberto P.' },
+    { id: 'r3', quote: 'Mis hijos ya no le tienen miedo al dentista, la Dra. Ramírez es maravillosa con ellos.', name: 'Carla D.' }
+  ],
   branches: [
     {
       id: 'b1',
@@ -50,13 +73,13 @@ const SEED = {
     }
   ],
   services: [
-    { id: 's1', title: 'Limpieza dental', desc: 'Profilaxis profesional para mantener tu boca sana y libre de placa.', durationMinutes: 45 },
-    { id: 's2', title: 'Ortodoncia', desc: 'Brackets tradicionales e invisibles para alinear tu sonrisa a tu ritmo.', durationMinutes: 30 },
-    { id: 's3', title: 'Blanqueamiento', desc: 'Aclara el color de tus dientes de forma segura y con resultados visibles.', durationMinutes: 45 },
-    { id: 's4', title: 'Endodoncia', desc: 'Tratamiento de conducto sin dolor, con tecnología de precisión.', durationMinutes: 60 },
-    { id: 's5', title: 'Implantes dentales', desc: 'Reemplaza piezas perdidas con soluciones duraderas y naturales.', durationMinutes: 60 },
-    { id: 's6', title: 'Odontopediatría', desc: 'Atención especializada y amigable para las sonrisas más pequeñas.', durationMinutes: 30 },
-    { id: 's7', title: 'Solo valoración', desc: 'Revisión inicial para diagnosticar y recomendar el mejor tratamiento.', durationMinutes: 20 }
+    { id: 's1', shape: 'ring', title: 'Limpieza dental', desc: 'Profilaxis profesional para mantener tu boca sana y libre de placa.', durationMinutes: 45 },
+    { id: 's2', shape: 'diamond', title: 'Ortodoncia', desc: 'Brackets tradicionales e invisibles para alinear tu sonrisa a tu ritmo.', durationMinutes: 30 },
+    { id: 's3', shape: 'circle', title: 'Blanqueamiento', desc: 'Aclara el color de tus dientes de forma segura y con resultados visibles.', durationMinutes: 45 },
+    { id: 's4', shape: 'square', title: 'Endodoncia', desc: 'Tratamiento de conducto sin dolor, con tecnología de precisión.', durationMinutes: 60 },
+    { id: 's5', shape: 'cross', title: 'Implantes dentales', desc: 'Reemplaza piezas perdidas con soluciones duraderas y naturales.', durationMinutes: 60 },
+    { id: 's6', shape: 'ring', title: 'Odontopediatría', desc: 'Atención especializada y amigable para las sonrisas más pequeñas.', durationMinutes: 30 },
+    { id: 's7', shape: 'circle', title: 'Solo valoración', desc: 'Revisión inicial para diagnosticar y recomendar el mejor tratamiento.', durationMinutes: 20 }
   ],
   appointments: []
 };
@@ -133,4 +156,28 @@ export function deleteAppointment(id) {
 
 export function getClinicName() {
   return readDb().clinicName;
+}
+
+export function getClinicContent() {
+  const db = readDb();
+  const content = {};
+  CONTENT_KEYS.forEach(function (key) { content[key] = db[key]; });
+  return content;
+}
+
+export function updateClinicContent(patch) {
+  const db = readDb();
+  CONTENT_KEYS.forEach(function (key) {
+    if (Object.prototype.hasOwnProperty.call(patch, key)) {
+      db[key] = patch[key];
+    }
+  });
+  writeDb(db);
+  return getClinicContentFrom(db);
+}
+
+function getClinicContentFrom(db) {
+  const content = {};
+  CONTENT_KEYS.forEach(function (key) { content[key] = db[key]; });
+  return content;
 }

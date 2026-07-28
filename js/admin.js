@@ -1,5 +1,5 @@
 import {
-  loadContent, saveContent, loadAppointments, saveAppointments, newId, readImageFile
+  loadContent, saveContentPatch, loadAppointments, saveAppointments, newId, readImageFile
 } from './content-store.js';
 import { checkLogoSVG } from './icons.js';
 import { API_BASE, ADMIN_TOKEN } from './config.js';
@@ -19,12 +19,16 @@ const DEMO_PASS = 'admin123';
 const state = {
   loggedIn: false,
   section: 'citas',
-  content: loadContent(),
+  content: await loadContent(),
   draft: null,
   appointments: loadAppointments(),
   remoteAppointments: []
 };
 state.draft = JSON.parse(JSON.stringify(state.content));
+
+function saveErrorAlert(err) {
+  alert(err.message || 'No se pudo guardar. Verifica que el backend esté disponible.');
+}
 
 function branchNameById(branchId) {
   const branch = (state.content.branches || []).find(function (b) { return b.id === branchId; });
@@ -299,11 +303,16 @@ function initHeroForm() {
     renderHeroImagePreview();
   });
 
-  document.getElementById('saveHeroBtn').addEventListener('click', function () {
-    state.content.hero = JSON.parse(JSON.stringify(state.draft.hero));
-    state.content.heroImage = state.draft.heroImage || null;
-    saveContent(state.content);
-    flashSaved('hero');
+  document.getElementById('saveHeroBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({
+        hero: JSON.parse(JSON.stringify(state.draft.hero)),
+        heroImage: state.draft.heroImage || null
+      });
+      flashSaved('hero');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
   });
 }
 
@@ -337,10 +346,13 @@ function initServicesForm() {
     state.draft.services.push({ id: newId('s'), shape: 'circle', title: 'Nuevo servicio', desc: 'Descripción breve del tratamiento.' });
     renderServicesForm();
   });
-  document.getElementById('saveServicesBtn').addEventListener('click', function () {
-    state.content.services = JSON.parse(JSON.stringify(state.draft.services));
-    saveContent(state.content);
-    flashSaved('servicios');
+  document.getElementById('saveServicesBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({ services: JSON.parse(JSON.stringify(state.draft.services)) });
+      flashSaved('servicios');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
   });
 }
 
@@ -402,10 +414,13 @@ function initTeamForm() {
     state.draft.team.push({ id: newId('t'), name: 'Nuevo doctor(a)', role: 'Especialidad', photo: null });
     renderTeamForm();
   });
-  document.getElementById('saveTeamBtn').addEventListener('click', function () {
-    state.content.team = JSON.parse(JSON.stringify(state.draft.team));
-    saveContent(state.content);
-    flashSaved('equipo');
+  document.getElementById('saveTeamBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({ team: JSON.parse(JSON.stringify(state.draft.team)) });
+      flashSaved('equipo');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
   });
 }
 
@@ -439,10 +454,13 @@ function initTestimonialsForm() {
     state.draft.testimonials.push({ id: newId('r'), quote: 'Nueva reseña de paciente.', name: 'Nombre del paciente' });
     renderTestimonialsForm();
   });
-  document.getElementById('saveTestimonialsBtn').addEventListener('click', function () {
-    state.content.testimonials = JSON.parse(JSON.stringify(state.draft.testimonials));
-    saveContent(state.content);
-    flashSaved('testimonios');
+  document.getElementById('saveTestimonialsBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({ testimonials: JSON.parse(JSON.stringify(state.draft.testimonials)) });
+      flashSaved('testimonios');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
   });
 }
 
@@ -507,10 +525,13 @@ function initBranchesForm() {
     });
     renderBranchesForm();
   });
-  document.getElementById('saveBranchesBtn').addEventListener('click', function () {
-    state.content.branches = JSON.parse(JSON.stringify(state.draft.branches));
-    saveContent(state.content);
-    flashSaved('sucursales');
+  document.getElementById('saveBranchesBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({ branches: JSON.parse(JSON.stringify(state.draft.branches)) });
+      flashSaved('sucursales');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
   });
 }
 

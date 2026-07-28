@@ -1,4 +1,6 @@
-export const CONTENT_KEY = 'dentalClinicContent';
+import { API_BASE, ADMIN_TOKEN } from './config.js';
+
+export const CONTENT_KEY = 'dentalClinicContentCache';
 export const APPTS_KEY = 'dentalClinicAppointments';
 
 export const SHAPE_OPTIONS = ['ring', 'diamond', 'circle', 'square', 'cross'];
@@ -62,19 +64,52 @@ function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export function loadContent() {
+function cacheContent(content) {
+  try { localStorage.setItem(CONTENT_KEY, JSON.stringify(content)); } catch (e) {}
+}
+
+function cachedContent() {
   try {
     const raw = localStorage.getItem(CONTENT_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      return Object.assign(deepClone(DEFAULT_CONTENT), parsed);
-    }
+    if (raw) return Object.assign(deepClone(DEFAULT_CONTENT), JSON.parse(raw));
   } catch (e) {}
   return deepClone(DEFAULT_CONTENT);
 }
 
-export function saveContent(content) {
-  localStorage.setItem(CONTENT_KEY, JSON.stringify(content));
+// Content (hero, sucursales, servicios, equipo, testimonios) lives on the
+// backend so every visitor and device sees the same data. If the backend is
+// unreachable, fall back to the last cached copy (or the built-in defaults)
+// so the site still renders.
+export async function loadContent() {
+  try {
+    const res = await fetch(API_BASE + '/api/clinic');
+    if (res.ok) {
+      const data = await res.json();
+      const merged = Object.assign(deepClone(DEFAULT_CONTENT), data);
+      cacheContent(merged);
+      return merged;
+    }
+  } catch (e) {}
+  return cachedContent();
+}
+
+// Sends a partial update (e.g. { hero: {...} } or { branches: [...] }) to the
+// backend and returns the resulting full content object. Throws if the
+// backend is unreachable or rejects the request — callers should surface
+// that to the admin instead of silently losing the edit.
+export async function saveContentPatch(patch) {
+  const res = await fetch(API_BASE + '/api/clinic', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + ADMIN_TOKEN },
+    body: JSON.stringify(patch)
+  });
+  if (!res.ok) {
+    throw new Error('No se pudo guardar. Verifica que el backend esté disponible.');
+  }
+  const data = await res.json();
+  const merged = Object.assign(deepClone(DEFAULT_CONTENT), data);
+  cacheContent(merged);
+  return merged;
 }
 
 export function loadAppointments() {
@@ -94,6 +129,22 @@ export function addAppointment(appt) {
   list.unshift(appt);
   saveAppointments(list);
   return list;
+}
+
+// Tries to save the appointment on the shared backend (so it's visible from
+// any device); if the backend is unreachable, falls back to this browser's
+// localStorage so the booking still succeeds for the visitor.
+export async function submitAppointment(appt) {
+  try {
+    const res = await fetch(API_BASE + '/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(appt)
+    });
+    if (res.ok) return await res.json();
+  } catch (e) {}
+  addAppointment(appt);
+  return appt;
 }
 
 export function waLink(phone, message) {
