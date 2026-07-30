@@ -37,6 +37,7 @@ export const DEFAULT_CONTENT = {
   },
   heroImage: null,
   gallery: [],
+  gallerySubtitle: 'Un vistazo a nuestro consultorio y equipo.',
   services: [
     { id: 's1', shape: 'ring', title: 'Limpieza dental', desc: 'Profilaxis profesional para mantener tu boca sana y libre de placa.' },
     { id: 's2', shape: 'diamond', title: 'Ortodoncia', desc: 'Brackets tradicionales e invisibles para alinear tu sonrisa a tu ritmo.' },

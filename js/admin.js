@@ -431,6 +431,7 @@ function initTeamForm() {
 /* ---------- Galería ---------- */
 
 function renderGalleryForm() {
+  document.getElementById('gallerySubtitleInput').value = state.draft.gallerySubtitle || '';
   const list = document.getElementById('galleryList');
   const gallery = state.draft.gallery || [];
   if (!gallery.length) {
@@ -475,6 +476,9 @@ function renderGalleryForm() {
 }
 
 function initGalleryForm() {
+  document.getElementById('gallerySubtitleInput').addEventListener('input', function (e) {
+    state.draft.gallerySubtitle = e.target.value;
+  });
   const errorEl = document.getElementById('galleryAddError');
   document.getElementById('addGalleryInput').addEventListener('change', function (e) {
     const file = e.target.files[0];
@@ -491,7 +495,10 @@ function initGalleryForm() {
   });
   document.getElementById('saveGalleryBtn').addEventListener('click', async function () {
     try {
-      state.content = await saveContentPatch({ gallery: JSON.parse(JSON.stringify(state.draft.gallery)) });
+      state.content = await saveContentPatch({
+        gallery: JSON.parse(JSON.stringify(state.draft.gallery)),
+        gallerySubtitle: state.draft.gallerySubtitle || ''
+      });
       flashSaved('galeria');
     } catch (err) {
       saveErrorAlert(err);

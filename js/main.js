@@ -88,6 +88,7 @@ function renderTeam() {
 
 function renderGallery() {
   const section = document.getElementById('galeria');
+  document.getElementById('gallerySubtitle').textContent = content.gallerySubtitle || '';
   const gallery = content.gallery || [];
   if (!gallery.length) {
     section.classList.add('hidden');
