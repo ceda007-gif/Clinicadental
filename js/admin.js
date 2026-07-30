@@ -360,8 +360,18 @@ function initSectionsForm() {
 function renderServicesForm() {
   const list = document.getElementById('servicesList');
   list.innerHTML = (state.draft.services || []).map(function (item, idx) {
+    const photoPreview = item.image
+      ? '<img src="' + item.image + '" alt="">'
+      : '<span>Sin foto</span>';
     return (
       '<div class="admin-card" data-idx="' + idx + '">' +
+        '<div class="photo-field">' +
+          '<div class="photo-preview">' + photoPreview + '</div>' +
+          '<div class="photo-field-actions">' +
+            '<label class="btn btn-admin btn-file">Subir<input type="file" class="svc-photo-input" accept="image/*" hidden></label>' +
+            (item.image ? '<button type="button" class="btn-text-remove svc-photo-remove">Quitar</button>' : '') +
+          '</div>' +
+        '</div>' +
         '<input type="text" class="svc-title" value="' + escapeAttr(item.title) + '" placeholder="Nombre del servicio" style="flex:1 1 200px;min-width:160px;font-weight:600">' +
         '<input type="text" class="svc-desc" value="' + escapeAttr(item.desc) + '" placeholder="Descripción breve" style="flex:2 1 260px;min-width:200px">' +
         '<label class="item-visible-toggle"><input type="checkbox" class="svc-visible"' + (item.hidden ? '' : ' checked') + '> Visible</label>' +
@@ -379,12 +389,30 @@ function renderServicesForm() {
       state.draft.services.splice(idx, 1);
       renderServicesForm();
     });
+    card.querySelector('.svc-photo-input').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      readImageFile(file).then(function (dataUrl) {
+        state.draft.services[idx].image = dataUrl;
+        renderServicesForm();
+      }).catch(function (err) {
+        alert(err.message);
+      });
+    });
+    const removeBtn = card.querySelector('.svc-photo-remove');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function () {
+        state.draft.services[idx].image = null;
+        renderServicesForm();
+      });
+    }
   });
 }
 
 function initServicesForm() {
   document.getElementById('addServiceBtn').addEventListener('click', function () {
-    state.draft.services.push({ id: newId('s'), shape: 'circle', title: 'Nuevo servicio', desc: 'Descripción breve del tratamiento.' });
+    state.draft.services.push({ id: newId('s'), shape: 'circle', title: 'Nuevo servicio', desc: 'Descripción breve del tratamiento.', image: null });
     renderServicesForm();
   });
   document.getElementById('saveServicesBtn').addEventListener('click', async function () {

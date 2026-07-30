@@ -57,9 +57,12 @@ function renderServices() {
   const services = visibleItems(content.services);
   const grid = document.getElementById('servicesGrid');
   grid.innerHTML = services.map(function (item) {
+    const media = item.image
+      ? '<div class="service-photo"><img src="' + item.image + '" alt="' + escapeHtml(item.title) + '"></div>'
+      : '<div class="icon-tile">' + shapeIconSVG(item.shape, '#0284c7', 20) + '</div>';
     return (
       '<div class="service-card">' +
-        '<div class="icon-tile">' + shapeIconSVG(item.shape, '#0284c7', 20) + '</div>' +
+        media +
         '<h3>' + escapeHtml(item.title) + '</h3>' +
         '<p>' + escapeHtml(item.desc) + '</p>' +
       '</div>'
