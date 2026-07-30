@@ -97,9 +97,13 @@ function renderGallery() {
 
   const grid = document.getElementById('galleryGrid');
   grid.innerHTML = gallery.map(function (item, idx) {
+    const caption = item.caption
+      ? '<span class="gallery-item-caption">' + escapeHtml(item.caption) + '</span>'
+      : '';
     return (
       '<button type="button" class="gallery-item" data-idx="' + idx + '">' +
-        '<img src="' + item.image + '" alt="' + escapeHtml(item.caption || content.clinicName) + '" loading="lazy">' +
+        '<span class="gallery-item-photo"><img src="' + item.image + '" alt="' + escapeHtml(item.caption || content.clinicName) + '" loading="lazy"></span>' +
+        caption +
       '</button>'
     );
   }).join('');
