@@ -34,9 +34,8 @@ function visibleItems(list) {
 }
 
 function renderHeader() {
-  document.getElementById('brandMark').innerHTML = checkLogoSVG('#ffffff', 20);
+  document.getElementById('headerLogo').alt = content.clinicName;
   document.getElementById('footerBrandMark').innerHTML = checkLogoSVG('#ffffff', 18);
-  document.getElementById('clinicName').textContent = content.clinicName;
   document.getElementById('footerClinicName').textContent = content.clinicName;
 }
 

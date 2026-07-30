@@ -78,6 +78,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; margin: 0
   flex: none;
 }
 .brand-name { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 19px; letter-spacing: -.2px; }
+.site-logo { height: 46px; width: auto; display: block; }
 .nav-links { display: flex; gap: 28px; flex-wrap: wrap; }
 .nav-links a { color: var(--text-1); font-size: 15px; font-weight: 500; }
 .nav-links a:hover { color: var(--accent); }
@@ -359,6 +360,7 @@ body.admin { background: var(--section-bg); }
 }
 .admin-login .brand { margin-bottom: 6px; }
 .admin-login .brand-mark { background: var(--admin-accent, #0d9488); }
+.admin-login .site-logo { height: 56px; margin: 0 auto; }
 .admin-login h1 { font-size: 22px; }
 .admin-login input {
   width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px;

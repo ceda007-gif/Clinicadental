@@ -98,8 +98,7 @@ function flashSaved(key) {
 /* ---------- Login ---------- */
 
 function initLogin() {
-  document.getElementById('loginBrandMark').innerHTML = checkLogoSVG('#ffffff', 20);
-  document.getElementById('loginClinicName').textContent = state.content.clinicName;
+  document.getElementById('loginLogo').alt = state.content.clinicName;
 
   document.getElementById('loginForm').addEventListener('submit', function (e) {
     e.preventDefault();

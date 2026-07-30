@@ -120,6 +120,7 @@ app.delete('/api/appointments/:id', requireAdmin, async function (req, res) {
 const SITE_ROOT = path.join(__dirname, '..');
 app.use('/css', express.static(path.join(SITE_ROOT, 'css')));
 app.use('/js', express.static(path.join(SITE_ROOT, 'js')));
+app.use('/img', express.static(path.join(SITE_ROOT, 'img')));
 app.get('/', function (req, res) { res.sendFile(path.join(SITE_ROOT, 'index.html')); });
 app.get('/index.html', function (req, res) { res.sendFile(path.join(SITE_ROOT, 'index.html')); });
 app.get('/admin.html', function (req, res) { res.sendFile(path.join(SITE_ROOT, 'admin.html')); });
