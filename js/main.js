@@ -17,6 +17,22 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function sectionVisible(key) {
+  const vis = content.sectionVisibility || {};
+  return vis[key] !== false;
+}
+
+function setSectionHidden(sectionId, navId, hidden) {
+  const section = document.getElementById(sectionId);
+  if (section) section.classList.toggle('hidden', hidden);
+  const navLink = navId && document.getElementById(navId);
+  if (navLink) navLink.classList.toggle('hidden', hidden);
+}
+
+function visibleItems(list) {
+  return (list || []).filter(function (item) { return !item.hidden; });
+}
+
 function renderHeader() {
   document.getElementById('brandMark').innerHTML = checkLogoSVG('#ffffff', 20);
   document.getElementById('footerBrandMark').innerHTML = checkLogoSVG('#ffffff', 18);
@@ -37,8 +53,11 @@ function renderHero() {
 }
 
 function renderServices() {
+  setSectionHidden('servicios', 'navServicios', !sectionVisible('servicios'));
+
+  const services = visibleItems(content.services);
   const grid = document.getElementById('servicesGrid');
-  grid.innerHTML = (content.services || []).map(function (item) {
+  grid.innerHTML = services.map(function (item) {
     return (
       '<div class="service-card">' +
         '<div class="icon-tile">' + shapeIconSVG(item.shape, '#0284c7', 20) + '</div>' +
@@ -49,7 +68,7 @@ function renderServices() {
   }).join('');
 
   const select = document.getElementById('fieldServicio');
-  (content.services || []).forEach(function (item) {
+  services.forEach(function (item) {
     const opt = document.createElement('option');
     opt.value = item.title;
     opt.textContent = item.title;
@@ -58,8 +77,10 @@ function renderServices() {
 }
 
 function renderWhyUs() {
+  setSectionHidden('nosotros', 'navNosotros', !sectionVisible('nosotros'));
+
   const grid = document.getElementById('whyUsGrid');
-  grid.innerHTML = (content.whyUs || []).map(function (item) {
+  grid.innerHTML = visibleItems(content.whyUs).map(function (item) {
     return (
       '<div class="whyus-item">' +
         '<div class="icon-circle">' + shapeIconSVG(item.shape, '#0ea5e9', 20) + '</div>' +
@@ -71,8 +92,10 @@ function renderWhyUs() {
 }
 
 function renderTeam() {
+  setSectionHidden('equipo', 'navEquipo', !sectionVisible('equipo'));
+
   const grid = document.getElementById('teamGrid');
-  grid.innerHTML = (content.team || []).map(function (item) {
+  grid.innerHTML = visibleItems(content.team).map(function (item) {
     const photo = item.photo
       ? '<div class="team-photo has-photo"><img src="' + item.photo + '" alt="' + escapeHtml(item.name) + '"></div>'
       : '<div class="team-photo"><span>foto placeholder</span></div>';
@@ -87,14 +110,13 @@ function renderTeam() {
 }
 
 function renderGallery() {
-  const section = document.getElementById('galeria');
   document.getElementById('gallerySubtitle').textContent = content.gallerySubtitle || '';
-  const gallery = content.gallery || [];
-  if (!gallery.length) {
-    section.classList.add('hidden');
+  const gallery = visibleItems(content.gallery);
+  if (!sectionVisible('galeria') || !gallery.length) {
+    setSectionHidden('galeria', 'navGaleria', true);
     return;
   }
-  section.classList.remove('hidden');
+  setSectionHidden('galeria', 'navGaleria', false);
 
   const grid = document.getElementById('galleryGrid');
   grid.innerHTML = gallery.map(function (item, idx) {
@@ -146,6 +168,8 @@ function branchWaMessage(branch) {
 }
 
 function renderBranches() {
+  setSectionHidden('sucursales', 'navSucursales', !sectionVisible('sucursales'));
+
   const grid = document.getElementById('branchesGrid');
   grid.innerHTML = branches().map(function (branch) {
     const link = waLink(branch.waPhone, branchWaMessage(branch));
@@ -182,8 +206,10 @@ function renderBranches() {
 }
 
 function renderTestimonials() {
+  setSectionHidden('testimonios', 'navTestimonios', !sectionVisible('testimonios'));
+
   const grid = document.getElementById('testimonialsGrid');
-  grid.innerHTML = (content.testimonials || []).map(function (item) {
+  grid.innerHTML = visibleItems(content.testimonials).map(function (item) {
     return (
       '<div class="testimonial-card">' +
         '<svg width="24" height="24" viewBox="0 0 24 24" style="margin-bottom:12px"><path d="M7 10c0-2.8 2.2-5 5-5v3c-1.1 0-2 .9-2 2h2v5H7v-5Zm9 0c0-2.8 2.2-5 5-5v3c-1.1 0-2 .9-2 2h2v5h-5v-5Z" fill="#0ea5e9"></path></svg>' +

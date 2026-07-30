@@ -89,6 +89,27 @@
         </div>
       </section>
 
+      <!-- SECCIONES -->
+      <section id="view-secciones" class="admin-view hidden">
+        <h1>Secciones visibles</h1>
+        <p class="subtitle">
+          Elige qué secciones se muestran en la página pública. Si ocultas una, su contenido
+          sigue guardado — solo deja de aparecer en el sitio hasta que la vuelvas a activar.
+        </p>
+        <div class="admin-panel">
+          <label class="section-toggle"><input type="checkbox" id="visServiciosInput"> Servicios</label>
+          <label class="section-toggle"><input type="checkbox" id="visNosotrosInput"> Por qué elegirnos</label>
+          <label class="section-toggle"><input type="checkbox" id="visEquipoInput"> Equipo</label>
+          <label class="section-toggle"><input type="checkbox" id="visGaleriaInput"> Galería</label>
+          <label class="section-toggle"><input type="checkbox" id="visSucursalesInput"> Sucursales</label>
+          <label class="section-toggle"><input type="checkbox" id="visTestimoniosInput"> Testimonios</label>
+          <div>
+            <button class="btn btn-admin admin-save" id="saveSeccionesBtn">Guardar cambios</button>
+            <span class="saved-flag hidden" id="savedSecciones">Guardado ✓</span>
+          </div>
+        </div>
+      </section>
+
       <!-- SERVICIOS -->
       <section id="view-servicios" class="admin-view hidden">
         <div class="admin-header-row">

@@ -92,7 +92,8 @@ async function runTool(name, input) {
     return { branches: (await getBranches()).map(branchSummary) };
   }
   if (name === 'list_services') {
-    return { services: (await getServices()).map(serviceSummary) };
+    const services = (await getServices()).filter(function (s) { return !s.hidden; });
+    return { services: services.map(serviceSummary) };
   }
   if (name === 'check_availability') {
     try {

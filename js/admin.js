@@ -7,6 +7,7 @@ import { API_BASE, ADMIN_TOKEN } from './config.js';
 const SECTIONS = [
   { id: 'citas', label: 'Citas' },
   { id: 'hero', label: 'Hero' },
+  { id: 'secciones', label: 'Secciones' },
   { id: 'servicios', label: 'Servicios' },
   { id: 'equipo', label: 'Equipo' },
   { id: 'galeria', label: 'Galería' },
@@ -166,6 +167,7 @@ function switchSection(id) {
 
   if (id === 'citas') renderAppointments();
   if (id === 'hero') renderHeroForm();
+  if (id === 'secciones') renderSectionsForm();
   if (id === 'servicios') renderServicesForm();
   if (id === 'equipo') renderTeamForm();
   if (id === 'galeria') renderGalleryForm();
@@ -320,6 +322,40 @@ function initHeroForm() {
   });
 }
 
+/* ---------- Secciones (visibilidad) ---------- */
+
+const SECTION_VISIBILITY_KEYS = ['servicios', 'nosotros', 'equipo', 'galeria', 'sucursales', 'testimonios'];
+
+function sectionVisibilityInputId(key) {
+  return 'vis' + key.charAt(0).toUpperCase() + key.slice(1) + 'Input';
+}
+
+function renderSectionsForm() {
+  const vis = state.draft.sectionVisibility || {};
+  SECTION_VISIBILITY_KEYS.forEach(function (key) {
+    document.getElementById(sectionVisibilityInputId(key)).checked = vis[key] !== false;
+  });
+}
+
+function initSectionsForm() {
+  SECTION_VISIBILITY_KEYS.forEach(function (key) {
+    document.getElementById(sectionVisibilityInputId(key)).addEventListener('change', function (e) {
+      if (!state.draft.sectionVisibility) state.draft.sectionVisibility = {};
+      state.draft.sectionVisibility[key] = e.target.checked;
+    });
+  });
+  document.getElementById('saveSeccionesBtn').addEventListener('click', async function () {
+    try {
+      state.content = await saveContentPatch({
+        sectionVisibility: JSON.parse(JSON.stringify(state.draft.sectionVisibility || {}))
+      });
+      flashSaved('secciones');
+    } catch (err) {
+      saveErrorAlert(err);
+    }
+  });
+}
+
 /* ---------- Servicios ---------- */
 
 function renderServicesForm() {
@@ -329,6 +365,7 @@ function renderServicesForm() {
       '<div class="admin-card" data-idx="' + idx + '">' +
         '<input type="text" class="svc-title" value="' + escapeAttr(item.title) + '" placeholder="Nombre del servicio" style="flex:1 1 200px;min-width:160px;font-weight:600">' +
         '<input type="text" class="svc-desc" value="' + escapeAttr(item.desc) + '" placeholder="Descripción breve" style="flex:2 1 260px;min-width:200px">' +
+        '<label class="item-visible-toggle"><input type="checkbox" class="svc-visible"' + (item.hidden ? '' : ' checked') + '> Visible</label>' +
         '<button class="btn-delete">Eliminar</button>' +
       '</div>'
     );
@@ -338,6 +375,7 @@ function renderServicesForm() {
     const idx = Number(card.getAttribute('data-idx'));
     card.querySelector('.svc-title').addEventListener('input', function (e) { state.draft.services[idx].title = e.target.value; });
     card.querySelector('.svc-desc').addEventListener('input', function (e) { state.draft.services[idx].desc = e.target.value; });
+    card.querySelector('.svc-visible').addEventListener('change', function (e) { state.draft.services[idx].hidden = !e.target.checked; });
     card.querySelector('.btn-delete').addEventListener('click', function () {
       state.draft.services.splice(idx, 1);
       renderServicesForm();
@@ -379,6 +417,7 @@ function renderTeamForm() {
         '</div>' +
         '<input type="text" class="team-name" value="' + escapeAttr(item.name) + '" placeholder="Nombre" style="flex:1 1 200px;min-width:160px;font-weight:600">' +
         '<input type="text" class="team-role" value="' + escapeAttr(item.role) + '" placeholder="Especialidad" style="flex:1 1 200px;min-width:160px">' +
+        '<label class="item-visible-toggle"><input type="checkbox" class="team-visible"' + (item.hidden ? '' : ' checked') + '> Visible</label>' +
         '<button class="btn-delete">Eliminar</button>' +
       '</div>'
     );
@@ -388,6 +427,7 @@ function renderTeamForm() {
     const idx = Number(card.getAttribute('data-idx'));
     card.querySelector('.team-name').addEventListener('input', function (e) { state.draft.team[idx].name = e.target.value; });
     card.querySelector('.team-role').addEventListener('input', function (e) { state.draft.team[idx].role = e.target.value; });
+    card.querySelector('.team-visible').addEventListener('change', function (e) { state.draft.team[idx].hidden = !e.target.checked; });
     card.querySelector('.btn-delete').addEventListener('click', function () {
       state.draft.team.splice(idx, 1);
       renderTeamForm();
@@ -449,6 +489,7 @@ function renderGalleryForm() {
           '</div>' +
         '</div>' +
         '<input type="text" class="gallery-caption" value="' + escapeAttr(item.caption || '') + '" placeholder="Descripción (opcional)" style="flex:1 1 200px;min-width:160px">' +
+        '<label class="item-visible-toggle"><input type="checkbox" class="gallery-visible"' + (item.hidden ? '' : ' checked') + '> Visible</label>' +
         '<button class="btn-delete">Eliminar</button>' +
       '</div>'
     );
@@ -457,6 +498,7 @@ function renderGalleryForm() {
   list.querySelectorAll('.admin-card').forEach(function (card) {
     const idx = Number(card.getAttribute('data-idx'));
     card.querySelector('.gallery-caption').addEventListener('input', function (e) { state.draft.gallery[idx].caption = e.target.value; });
+    card.querySelector('.gallery-visible').addEventListener('change', function (e) { state.draft.gallery[idx].hidden = !e.target.checked; });
     card.querySelector('.btn-delete').addEventListener('click', function () {
       state.draft.gallery.splice(idx, 1);
       renderGalleryForm();
@@ -515,6 +557,7 @@ function renderTestimonialsForm() {
       '<div class="admin-card" data-idx="' + idx + '" style="align-items:flex-start">' +
         '<textarea class="tst-quote" placeholder="Reseña" rows="2" style="flex:2 1 260px;min-width:220px">' + escapeHtml(item.quote) + '</textarea>' +
         '<input type="text" class="tst-name" value="' + escapeAttr(item.name) + '" placeholder="Nombre del paciente" style="flex:1 1 160px;min-width:140px">' +
+        '<label class="item-visible-toggle"><input type="checkbox" class="tst-visible"' + (item.hidden ? '' : ' checked') + '> Visible</label>' +
         '<button class="btn-delete">Eliminar</button>' +
       '</div>'
     );
@@ -524,6 +567,7 @@ function renderTestimonialsForm() {
     const idx = Number(card.getAttribute('data-idx'));
     card.querySelector('.tst-quote').addEventListener('input', function (e) { state.draft.testimonials[idx].quote = e.target.value; });
     card.querySelector('.tst-name').addEventListener('input', function (e) { state.draft.testimonials[idx].name = e.target.value; });
+    card.querySelector('.tst-visible').addEventListener('change', function (e) { state.draft.testimonials[idx].hidden = !e.target.checked; });
     card.querySelector('.btn-delete').addEventListener('click', function () {
       state.draft.testimonials.splice(idx, 1);
       renderTestimonialsForm();
@@ -641,6 +685,7 @@ function initAssistantForm() {
 
 initLogin();
 initHeroForm();
+initSectionsForm();
 initServicesForm();
 initTeamForm();
 initGalleryForm();

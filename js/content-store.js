@@ -38,6 +38,14 @@ export const DEFAULT_CONTENT = {
   heroImage: null,
   gallery: [],
   gallerySubtitle: 'Un vistazo a nuestro consultorio y equipo.',
+  sectionVisibility: {
+    servicios: true,
+    nosotros: true,
+    equipo: true,
+    galeria: true,
+    sucursales: true,
+    testimonios: true
+  },
   services: [
     { id: 's1', shape: 'ring', title: 'Limpieza dental', desc: 'Profilaxis profesional para mantener tu boca sana y libre de placa.' },
     { id: 's2', shape: 'diamond', title: 'Ortodoncia', desc: 'Brackets tradicionales e invisibles para alinear tu sonrisa a tu ritmo.' },

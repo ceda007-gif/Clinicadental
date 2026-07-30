@@ -14,7 +14,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const pool = DATABASE_URL ? new pg.Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } }) : null;
 let pgReady = null;
 
-const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches', 'assistantInstructions', 'gallery', 'gallerySubtitle'];
+const CONTENT_KEYS = ['clinicName', 'hero', 'heroImage', 'services', 'whyUs', 'team', 'testimonials', 'branches', 'assistantInstructions', 'gallery', 'gallerySubtitle', 'sectionVisibility'];
 
 const SEED = {
   clinicName: 'Clínica Dental Sonrisa',
@@ -27,6 +27,14 @@ const SEED = {
   heroImage: null,
   gallery: [],
   gallerySubtitle: 'Un vistazo a nuestro consultorio y equipo.',
+  sectionVisibility: {
+    servicios: true,
+    nosotros: true,
+    equipo: true,
+    galeria: true,
+    sucursales: true,
+    testimonios: true
+  },
   whyUs: [
     { id: 'w1', shape: 'circle', title: 'Tecnología moderna', desc: 'Equipos digitales de diagnóstico para tratamientos más precisos.' },
     { id: 'w2', shape: 'cross', title: 'Doctores certificados', desc: 'Especialistas con años de experiencia y formación continua.' },
